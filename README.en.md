@@ -14,6 +14,7 @@ Everything is designed around one idea: **your real config files live in this re
 |---|---|
 | Installed a new program / added new configs | `dotsync` |
 | Edited a file that already exists in the repo | `dotgit` |
+| Changed something **outside your home** (e.g. SDDM theme) | `sync.sh` then `dotgit` |
 | Fresh new machine | `git clone` + `./scripts/install.sh` (see [New machine setup](#new-machine-setup)) |
 
 ```sh
@@ -125,6 +126,32 @@ dotgit                # backup: commit + push
 Check that a change was actually saved with `git status --short` inside `~/dotfiles` — a `M` line means Git sees it; empty output means nothing was saved.
 
 > **Key distinction:** `source ~/.zshrc` makes the change live **on this machine now**. `dotgit` puts it **on GitHub**. They are different things that happen to be run together.
+
+---
+
+## System-level changes (outside your home) — no surprises ⚠️
+
+Any change you make to **system files outside your home** — like switching the SDDM theme or editing login-screen settings — **is invisible to the automatic scripts**:
+
+- `dotsync` only covers `~/.config` and the package lists — **it never touches `system/`**
+- So the repo stays stuck on the old version, and if you reformat, `install.sh` will restore you **with the old setup**
+
+### The rule
+
+| You changed | Command |
+|---|---|
+| Configs inside `~/.config` or installed a program | `dotsync` |
+| System files outside home (SDDM, boot settings...) | `sync.sh` ← then `dotgit` |
+| Edited an existing file as-is | `dotgit` only |
+
+```sh
+./scripts/sync.sh    # refreshes system/sddm/ and copied/ from the current machine (needs sudo)
+dotgit               # pushes the change to GitHub
+```
+
+> Note that `sync.sh` **does not commit or push** — it only refreshes files. Pushing is always manual via `dotgit`.
+>
+> **Practical rule before any reformat:** run `./scripts/sync.sh` fully once and push with `dotgit` — then you're guaranteed the repo knows about every new change.
 
 ---
 
