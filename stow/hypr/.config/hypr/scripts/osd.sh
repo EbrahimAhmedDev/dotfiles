@@ -19,9 +19,24 @@ VOL_COLOR="${WOB_VOL:-b388ff}"
 MUTE_COLOR="${WOB_MUTE:-ff5252}"
 BRIGHT_COLOR="${WOB_BRIGHT:-ffd54f}"
 
+# --- click sounds (KDE Ocean theme, played via pw-play) ---
+SND_DIR="/usr/share/sounds/ocean/stereo"
+play_sound() { # play_sound <file.oga> — throttled so key-repeat doesn't spam
+    [ -f "$1" ] || return 0
+    command -v pw-play >/dev/null 2>&1 || return 0
+    now=$(date +%s%N)
+    _tsf="${XDG_RUNTIME_DIR:-/tmp}/osd-sound.ts"
+    if [ -f "$_tsf" ]; then
+        prev=$(cat "$_tsf")
+        [ $(( (now - prev) / 1000000 )) -lt 150 ] && return 0
+    fi
+    echo "$now" > "$_tsf"
+    pw-play "$1" >/dev/null 2>&1 &
+}
+
 case "$1" in
-    vol-up)      wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ ;;
-    vol-down)    wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- ;;
+    vol-up)      wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ ; play_sound "$SND_DIR/audio-volume-change.oga" ;;
+    vol-down)    wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- ; play_sound "$SND_DIR/audio-volume-change.oga" ;;
     mute)        wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;
     mic-mute)    wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle ;;
     bright-up)   brightnessctl -q set 5%+ ;;

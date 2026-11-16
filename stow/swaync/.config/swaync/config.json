@@ -28,6 +28,14 @@
 
   "notification-grouping": false,
 
+  "scripts": {
+    "notification-sound": {
+      "exec": "pw-play /usr/share/sounds/ocean/stereo/message-new-instant.oga",
+      "notification_id": -1,
+      "run-on": "recevied"
+    }
+  },
+
   "timeout": 5,
   "timeout-low": 3,
   "timeout-critical": 0,
