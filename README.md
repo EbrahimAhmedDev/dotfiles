@@ -36,6 +36,16 @@ cd ~/dotfiles
 3. Copy the files in `copied/` into `~/.config`.
 4. Apply the SDDM config/theme and enable SDDM.
 
+### Day-to-day (after installing anything new)
+
+```sh
+./scripts/dotsync.sh    # or just: dotsync
+```
+
+It refreshes package lists, asks `y/N` for every new folder in `~/.config`
+(press `y` for configs you want to keep), links stow packages that aren't
+linked yet, then commits and pushes everything.
+
 ### On the current machine
 
 ```sh
