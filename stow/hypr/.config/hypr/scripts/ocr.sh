@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
-# OCR: تحدد جزء من الشاشة → استخراج النص (عربي + إنجليزي) → الكليبورد
-# مفتوحة بـ SUPER + SHIFT + O
+# OCR: select a screen area -> extract text (English + Arabic) -> clipboard
+# Opens with SUPER + SHIFT + O
 
 set -u
 
 if ! command -v tesseract >/dev/null 2>&1; then
-    notify-send -u critical "📷 OCR" "tesseract مش متثبت.\nثبته:\nsudo pacman -S tesseract tesseract-data-eng tesseract-data-ara"
+    notify-send -u critical "OCR" "tesseract is not installed. Install it with:\nsudo pacman -S tesseract tesseract-data-eng tesseract-data-ara"
     exit 1
 fi
 
-# تجميد الشاشة أثناء التحديد (نفس أسلوب screenshot-edit.sh)
+# Freeze the screen while selecting (same approach as screenshot-edit.sh)
 hyprpicker -r -z >/dev/null 2>&1 &
 freeze_pid=$!
 sleep 0.3
@@ -28,9 +28,9 @@ text=$(tesseract "$tmp" - -l eng+ara --psm 3 2>/dev/null | sed '/^[[:space:]]*$/
 rm -f "$tmp"
 
 if [ -z "$text" ]; then
-    notify-send "📷 OCR" "مفيش نص اتلقط"
+    notify-send "OCR" "No text detected"
     exit 0
 fi
 
 printf '%s' "$text" | wl-copy
-notify-send "📷 OCR" "النص اتنسخ للكليبورد ✅"
+notify-send "OCR" "Text copied to clipboard ✓"

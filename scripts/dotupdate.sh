@@ -1,40 +1,40 @@
 #!/usr/bin/env bash
-# التحديث الموحد: مستودعات + AUR + تنظيف كاش pacman
-# يشتغل من التيرمنال: dotupdate   (أو من قائمة التحكم SUPER+CTRL+S)
+# Unified update: repos + AUR + pacman cache cleanup.
+# Run from a terminal: dotupdate   (or from the control menu SUPER+CTRL+S)
 
-echo "🔄 التحديث الموحد"
+echo "🔄 Unified Update"
 echo "══════════════════"
 echo
-echo "⏳ بيفحص التحديثات..."
+echo "⏳ Checking for updates..."
 
 repos=$(checkupdates 2>/dev/null | wc -l)
 aur=$(yay -Qua 2>/dev/null | wc -l)
 total=$((repos + aur))
 
 if [ "$total" -eq 0 ]; then
-    echo "✅ مفيش أي تحديثات — النظام حدث بالكامل."
-    notify-send "🔄 التحديث" "مفيش تحديثات ✅"
-    read -rn1 -k "?اضغط أي زر للقفل..."
+    echo "✅ No updates available — system is fully up to date."
+    notify-send "Update" "No updates available ✓"
+    read -rn1 -k "?Press any key to close..."
     exit 0
 fi
 
-echo "📦 متاح: $repos من المستودعات + $aur من AUR (إجمالاً $total)"
+echo "📦 Available: $repos from repos + $aur from AUR ($total total)"
 echo "────────────────────────────"
 checkupdates 2>/dev/null | head -20
-[ "$aur" -gt 0 ] && echo "... + $aur حزمة من AUR"
+[ "$aur" -gt 0 ] && echo "... + $aur packages from AUR"
 echo "────────────────────────────"
 echo
-read -rp "نفّذ التحديث كله؟ [y/N] " answer
-case "$answer" in [yY]*) ;; *) echo "تم اللغاء."; exit 0 ;; esac
+read -rp "Run the full update? [y/N] " answer
+case "$answer" in [yY]*) ;; *) echo "Cancelled."; exit 0 ;; esac
 
 if yay -Syu; then
     echo
-    echo "🧹 بتنضف كاش pacman (يبقي آخر نسخة لكل حزمة)..."
+    echo "🧹 Cleaning pacman cache (keeping the last version per package)..."
     sudo paccache -rk1 2>/dev/null || true
-    notify-send "🔄 التحديث" "خلص بنجاح ✅"
-    echo "✅ التحديث خلص."
+    notify-send "Update" "Finished successfully ✓"
+    echo "✅ Update finished."
 else
-    notify-send -u critical "🔄 التحديث" "فيه فشل ❌ (شوف الأخطاء فوق)"
-    echo "❌ التحديث فشل — شوف الأخطاء فوق."
+    notify-send -u critical "Update" "Update failed ✗ (check the errors above)"
+    echo "❌ Update failed — check the errors above."
 fi
-read -rn1 -k "?اضغط أي زر للقفل..."
+read -rn1 -k "?Press any key to close..."
