@@ -21,6 +21,9 @@ BRIGHT_COLOR="${WOB_BRIGHT:-ffd54f}"
 
 # --- click sounds (KDE Ocean theme, played via pw-play) ---
 SND_DIR="/usr/share/sounds/ocean/stereo"
+_sndconf="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/sounds.conf"
+[ -f "$_sndconf" ] && . "$_sndconf"
+SND_VOLUME="${SND_VOLUME:-0.6}"
 play_sound() { # play_sound <file.oga> — throttled so key-repeat doesn't spam
     [ -f "$1" ] || return 0
     command -v pw-play >/dev/null 2>&1 || return 0
@@ -31,7 +34,7 @@ play_sound() { # play_sound <file.oga> — throttled so key-repeat doesn't spam
         [ $(( (now - prev) / 1000000 )) -lt 150 ] && return 0
     fi
     echo "$now" > "$_tsf"
-    pw-play "$1" >/dev/null 2>&1 &
+    pw-play --volume "$SND_VOLUME" "$1" >/dev/null 2>&1 &
 }
 
 case "$1" in

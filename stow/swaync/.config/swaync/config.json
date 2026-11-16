@@ -30,7 +30,7 @@
 
   "scripts": {
     "notification-sound": {
-      "exec": "pw-play /usr/share/sounds/ocean/stereo/message-new-instant.oga",
+      "exec": "$HOME/.config/hypr/scripts/notify-sound.sh",
       "notification_id": -1,
       "run-on": "recevied"
     }
