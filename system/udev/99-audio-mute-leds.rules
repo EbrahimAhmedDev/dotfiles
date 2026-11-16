@@ -1,0 +1,6 @@
+# Let the desktop user drive the ThinkPad mute/mic-mute keyboard LEDs.
+# PipeWire/WirePlumber doesn't sync them (PulseAudio used to), so osd.sh
+# writes to these LED files directly. Group "video" is chosen because the
+# desktop user is already a member.
+SUBSYSTEM=="leds", KERNEL=="platform::mute",    MODE="0660", GROUP="video"
+SUBSYSTEM=="leds", KERNEL=="platform::micmute", MODE="0660", GROUP="video"

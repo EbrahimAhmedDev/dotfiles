@@ -26,6 +26,13 @@ done
 
 cp -n "$dot"/copied/* "$HOME/.config/" 2>/dev/null || true
 
+# udev rule: let the user sync the audio mute LEDs (PipeWire doesn't do it)
+[ -d "$dot/system/udev" ] && {
+    sudo cp "$dot"/system/udev/*.rules /etc/udev/rules.d/
+    sudo udevadm control --reload-rules
+    sudo udevadm trigger
+}
+
 # SDDM
 s="$dot/system/sddm"
 sudo mkdir -p /etc/sddm.conf.d
