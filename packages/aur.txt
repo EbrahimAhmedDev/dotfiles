@@ -1,0 +1,12 @@
+bibata-cursor-theme
+brave-bin
+clipse
+google-chrome
+gpu-screen-recorder-gtk
+hyprmod
+nmrs-bin
+sddm-silent-theme
+spotify
+waypaper
+wlogout
+yay
