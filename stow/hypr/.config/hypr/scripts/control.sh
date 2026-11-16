@@ -24,7 +24,7 @@ case "$choice" in
     *Network*)      exec nmrs-gui ;;
     *Bluetooth*)    exec blueman-manager ;;
     *Audio*)        exec pavucontrol ;;
-    *Power*)        exec "$HOME/.config/waybar/custom_modules/power-cycle.sh" ;;
+    *Power*)        exec "$HOME/.config/waybar/custom_modules/power-picker.sh" ;;
     *Theme*)        exec "$scripts/theme.sh" ;;
     *Wallpaper*)    exec waypaper ;;
     *Update*)       exec ghostty -e "$HOME/dotfiles/scripts/dotupdate.sh" ;;

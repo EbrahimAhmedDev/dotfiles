@@ -39,7 +39,7 @@
         },
         "format": "{capacity}% {icon}",
         "tooltip-format": "{timeTo}\nClick to cycle power profile",
-        "on-click": "~/.config/waybar/custom_modules/power-cycle.sh",
+        "on-click": "~/.config/waybar/custom_modules/power-picker.sh",
         "format-icons": {
             "default": [
                 "󰂎",

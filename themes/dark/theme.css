@@ -6,3 +6,6 @@
 @define-color dark-6 rgba(82, 82, 91, 1);
 @define-color dark-5 rgba(113, 113, 122, 1);
 @define-color fg rgba(255, 255, 255, 1);
+@define-color warn rgba(241, 196, 15, 1);
+@define-color good rgba(66, 255, 159, 1);
+@define-color on-highlight rgba(0, 0, 0, 1);
