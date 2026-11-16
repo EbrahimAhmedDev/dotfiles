@@ -10,6 +10,3 @@ stow/clipse/.config/clipse/tmp_files/
 
 # Stow noise
 stow/*/.config/**/stack.toml
-
-# System-specific state
-copied/
