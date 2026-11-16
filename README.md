@@ -1,18 +1,20 @@
-# ebrahim's dotfiles
+# إعدادات إبراهيم (dotfiles)
 
-Linux (Arch) dotfiles for a Hyprland setup, managed with [GNU stow](https://www.gnu.org/software/stow/) and backed up on GitHub.
+إعدادات لينكس (Arch) لسطح مكتب Hyprland، مُدارّة بـ [GNU stow](https://www.gnu.org/software/stow/) ومحفوظة احتياطياً على GitHub.
 
-Everything is designed around one idea: **your real config files live in this repo, and your home folder is just links pointing at them.** Edit once, back up with one command, restore on any machine with one script.
+الفكرة كلها بتيجي في سطر واحد: **ملفات الإعدادات الحقيقية عايشة جوه الريبو ده، وفولدر الـ home عندك مجرد لينكات بيشاور عليه.** تعدّل مرة واحدة، تحفظ احتياطي بأمر واحد، وترجّع كل حاجة على أي جهاز بسكربت واحد.
+
+🌍 **اللغة:** [العربية](README.md) • [English](README.en.md)
 
 ---
 
-## TL;DR — the 3 commands you actually need
+## الملخص السريع — 3 أوامر بس دول اللي محتاجهم
 
-| Situation | Command |
+| الموقف | الأمر |
 |---|---|
-| Installed a new program / added new configs | `dotsync` |
-| Edited a file that already exists in the repo | `dotgit` |
-| Fresh new machine | `git clone` + `./scripts/install.sh` (see [New machine setup](#new-machine-setup)) |
+| نزّلت برنامج جديد / ضفت إعدادات جديدة | `dotsync` |
+| عدّلت ملف موجود أصلاً في الريبو | `dotgit` |
+| جهاز جديد خالص | `git clone` + `./scripts/install.sh` (شوف [تجهيز جهاز جديد](#تجهيز-جهاز-جديد)) |
 
 ```sh
 git clone https://github.com/EbrahimAhmedDev/dotfiles.git ~/dotfiles
@@ -21,66 +23,66 @@ cd ~/dotfiles && ./scripts/install.sh
 
 ---
 
-## How it works (the mental model)
+## إزاي بيشتغل (النموذج الذهني)
 
-### GNU stow in one paragraph
+### GNU stow في فقرة واحدة
 
-`stow` takes a folder of configs (a "package") and creates **symlinks** from your `$HOME` into it. Nothing is copied — your `~/.config/waybar` is literally a link into this repo.
+`stow` بياخد فولدر فيه إعداداتك ("باكدج") وبيعمل **symlinks** (لينكات رمزية) من الـ `$HOME` بتاعك داخل الفولدر ده. مفيش أي نسخ — الـ `~/.config/waybar` عندك حرفياً لينك جوه الريبو.
 
 ```
-~/.config/waybar/config.jsonc          ← symlink (a shortcut, not a real file)
+~/.config/waybar/config.jsonc          ← لينك رمزي (اختصار، مش ملف حقيقي)
         │
-        └──→  ~/dotfiles/stow/waybar/.config/waybar/config.jsonc   ← the real file
+        └──→  ~/dotfiles/stow/waybar/.config/waybar/config.jsonc   ← الملف الحقيقي
 ```
 
-### What this buys you
+### يعني ده جابلك إيه؟
 
-- **Edit from anywhere.** Opening `~/.config/waybar/config.jsonc` and editing it *is* editing the repo file. There is no "sync step" and no copy to forget.
-- **One backup location.** The repo contains every config; `git push` backs up all of it.
-- **Atomic removal.** Un-stowing a package removes all its links at once, leaving no crumbs.
+- **تعدّل من أي مكان.** فتح `~/.config/waybar/config.jsonc` وتعديله *هو* نفسه تعديل ملف الريبو. مفيش "خطوة تزامن" ومفيش نسخة ممكن تنساها.
+- **مكان حفظ احتياطي واحد.** الريبو فيه كل الإعدادات، و`git push` يخليه كله على GitHub.
+- **شيل مرتب.** فك أي باكدج بيشيل كل لينكاته مرة واحدة من غير فتات.
 
-### Files that can't be linked (the `copied/` exception)
+### الملفات اللي مينفعش تتعملها لينك (استثناء `copied/`)
 
-Some programs refuse to follow symlinks, or rewrite the file in place and destroy the link (KDE apps like `kdeglobals`/`dolphinrc`, `mimeapps.list`, `user-dirs.dirs`...). Those live in `copied/` and are **copied** into `~/.config` by `install.sh` instead of linked. `sync.sh` refreshes them from your live system.
+بعض البرامج بترفض تتبع الـ symlinks، أو بتعيد كتابة الملف مكان اللينك فبتكسره (برامج KDE زي `kdeglobals` و `dolphinrc`، و `mimeapps.list`، و `user-dirs.dirs`...). دي بتتعيش في `copied/` وبيتنسخوا **نسخ** جوه `~/.config` بواسطة `install.sh` بدل الـ linking. وسكربت `sync.sh` بيحدّثهم من جهازك الحقيقي.
 
-### Files outside your home (the `system/` exception)
+### الملفات اللي برة الـ home (استثناء `system/`)
 
-SDDM (the login screen) reads its config from `/etc/` and its theme from `/usr/share/` — outside your home, so stow can't reach those. `system/sddm/` holds copies of them, and `install.sh` puts them back with `sudo`.
+شاشة الـ SDDM (تسجيل الدخول) بتقرا إعداداتها من `/etc/` والثيم من `/usr/share/` — دول برة الـ home فالـ stow مش واصل ليهم. فولدر `system/sddm/` فيه نسخ منهم، و`install.sh` بيرجّعهم بأمر `sudo`.
 
 ---
 
-## Repo layout
+## هيكل الريبو
 
 ```
 dotfiles/
-├── stow/            # the actual configs, one folder = one stow package
-│   ├── hypr/        #   .config/hypr/...    → linked to ~/.config/hypr
-│   ├── waybar/      #   .config/waybar/...  → linked to ~/.config/waybar
-│   ├── zsh/         #   special: holds $HOME-level files (.zshrc, .zprofile...)
+├── stow/            # الإعدادات الحقيقية، فولدر واحد = باكدج stow واحد
+│   ├── hypr/        #   .config/hypr/...    → بينعمله لينك في ~/.config/hypr
+│   ├── waybar/      #   .config/waybar/...  → بينعمله لينك في ~/.config/waybar
+│   ├── zsh/         #   خاص: فيه ملفات مستوى $HOME (.zshrc, .zprofile...)
 │   └── ...
-├── packages/        # package lists, generated automatically
-│   ├── official.txt #   every pacman repo package (one name per line)
-│   └── aur.txt      #   every AUR package
-├── copied/          # configs that must be COPIED, not linked
-├── system/          # system-level files (SDDM config + theme)
-├── scripts/         # all the automation, see below
+├── packages/        # قوائم الحزم، بتتولد تلقائياً
+│   ├── official.txt #   كل حزم pacman من الريبو الرسمية (اسم في كل سطر)
+│   └── aur.txt      #   كل حزم AUR
+├── copied/          # إعدادات لازم تتنسخ، مش لينك
+├── system/          # ملفات مستوى النظام (إعدادات + ثيم SDDM)
+├── scripts/         # كل الأتمتة، شوف تحت
 └── README.md
 ```
 
-A "stow package" is just a folder whose internal structure mirrors `$HOME`. `stow/<pkg>/.config/foo` becomes `~/.config/foo` when stowed.
+"باكدج stow" هو مجرد فولدر بنيته الداخلية بتعكس شكل الـ `$HOME`. يعني `stow/<pkg>/.config/foo` بتبقى `~/.config/foo` بعد الـ stow.
 
 ---
 
-## The scripts
+## السكربتات
 
-| Script | Runs when | What it does |
+| السكربت | بيتشغل امتى | بيعمل إيه |
 |---|---|---|
-| `install.sh` | **once, on a new machine** | Installs packages from the lists, deletes conflicting default configs, stows everything, copies `copied/`, applies SDDM, enables SDDM |
-| `dotsync.sh` | **daily / after installing anything** | Refreshes package lists, asks `y/N` for every new item in `~/.config`, links missing packages, moves loose zsh files, commits + pushes |
-| `sync.sh` | **occasionally** (before leaving a machine) | Like `dotsync` but also refreshes `copied/` and `system/sddm/` (needs sudo) |
-| `stow-all.sh` | legacy | The old manual-move script (older stow list) |
+| `install.sh` | **مرة واحدة، على جهاز جديد** | بيستب الحزم من القوائم، بيمسح الإعدادات الافتراضية المتعارضة، بيعمل stow للكل، بينسخ `copied/`، بظبط SDDM ويشغله |
+| `dotsync.sh` | **يومياً / بعد تثبيت أي حاجة** | بيحدّث قوائم الحزم، بيسألك `y/N` عن كل عنصر جديد في `~/.config`، بيعمل لينك للباكدجات الناقصة، بينقل ملفات zsh المبعثرة، وبعمل commit + push |
+| `sync.sh` | **من وقت لآخر** (قبل ما تسبق الجهاز) | زي `dotsync` بس كمان بيحدّث `copied/` و `system/sddm/` (محتاج sudo) |
+| `stow-all.sh` | قديم | السكربت القديم اليدوي (قايمة stow أقدم) |
 
-Two zsh aliases make the daily flow painless:
+ولإلياسين في zsh بيخلو الشغل اليومي سهل:
 
 ```sh
 alias dotgit='cd ~/dotfiles && git add -A && git commit -m "update $(date +%F)" && git push'
@@ -89,125 +91,125 @@ alias dotsync="$HOME/dotfiles/scripts/dotsync.sh"
 
 ---
 
-## Day-to-day workflow
+## الشغل اليومي
 
-### Installed a new program
+### نزّلت برنامج جديد
 
 ```sh
-sudo pacman -S fastfetch     # 1. install normally
-dotsync                      # 2. refresh lists + claim its config + push
+sudo pacman -S fastfetch     # 1. ثبّت عادي
+dotsync                      # 2. حدّث القوائم + خد الـ config بتاعه + ارفع
 ```
 
-`dotsync` will prompt for every new unmanaged folder in `~/.config`:
+`dotsync` هيسألك عن كل فولدر جديد غير مُدار في `~/.config`:
 
 ```
 stow 'fastfetch'? [y/N]
 ```
 
-- `y` → the folder moves into `stow/fastfetch/`, gets linked, the package is recorded, everything is committed and pushed.
-- Enter / `N` → the folder stays as a plain folder in `~/.config`, untracked and not asked about again.
+- `y` → الفولدر بيتنقل لـ `stow/fastfetch/`، بيتعمله لينك، الحزمة بتتسجل، وكل حاجة بتتعملها commit وترفع.
+- Enter أو `N` → الفولدر يفضل فولدر عادي في `~/.config`، غير متتبع ومش هيتسأل عنه تاني.
 
-Two independent things get updated, and both matter:
+حاجتين مستقلتين بيتحدثوا، والاتنين مهمين:
 
-1. **The package** → recorded in `packages/` (so a new machine can install it)
-2. **Its config** → moved into `stow/` (so a new machine gets it configured)
+1. **الحزمة نفسها** → بتتسجل في `packages/` (عشان جهاز جديد يعرف يثبتها)
+2. **إعداداتها** → بتنتقل لـ `stow/` (عشان جهاز جديد يلاقيها مضبوطة)
 
-### Edited an existing config
+### عدّلت إعداد موجود أصلاً
 
 ```sh
-micro ~/.zshrc        # edit + save — this IS the repo file (symlink)
-source ~/.zshrc       # optional: apply to the current terminal
-dotgit                # backup: commit + push
+micro ~/.zshrc        # عدّل واحفظ — ده فعلاً ملف الريبو (symlink)
+source ~/.zshrc       # اختياري: طبّق التعديل في التيرمنال الحالي
+dotgit                # نسخة احتياطية: commit + push
 ```
 
-Check that a change was actually saved with `git status --short` inside `~/dotfiles` — a `M` line means Git sees it; empty output means nothing was saved.
+اتأكد إن التعديل اتحفظ فعلاً بـ `git status --short` جوه `~/dotfiles` — سطر فيه `M` معناه إن Git شايفه؛ لو الناتج فاضي يبقى محفظتش.
 
-> **Key distinction:** `source ~/.zshrc` makes the change live **on this machine now**. `dotgit` puts it **on GitHub**. They are different things that happen to be run together.
+> **فرق مهم:** `source ~/.zshrc` بيخلي التعديل شغال **على الجهاز ده دلوقتي**. أما `dotgit` فبيحطه **على GitHub**. حاجتين مختلفتين بيحصل انهم بيتنفذوا سوا.
 
 ---
 
-## New machine setup
+## تجهيز جهاز جديد
 
 ```sh
-# 1. tools first
+# 1. الأدوات الأول
 sudo pacman -S git github-cli stow
-gh auth login                      # or set up SSH keys
+gh auth login                      # أو ظبط مفاتيح SSH
 
-# 2. get the repo
+# 2. انزل الريبو
 git clone https://github.com/EbrahimAhmedDev/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 
-# 3. everything else
-./scripts/install.sh               # packages + links + copied/ + SDDM
+# 3. كل حاجة تانية
+./scripts/install.sh               # حزم + لينكات + copied/ + SDDM
 
 reboot
 ```
 
-What `install.sh` does internally:
+`install.sh` بيعمل داخلياً:
 
-1. Installs `stow`, then everything from `packages/official.txt` (and `packages/aur.txt` via `yay` if present).
-2. For each stow package, deletes conflicting default configs in `$HOME` first (stow refuses to link over real files), then stows it.
-3. Copies `copied/*` into `~/.config` (with `cp -n`, won't overwrite).
-4. Applies `system/sddm/*` to `/etc/` and `/usr/share/sddm/themes/silent`, enables SDDM.
+1. بيثبّت `stow`، وبعدين كل حاجة من `packages/official.txt` (و `packages/aur.txt` عن طريق `yay` لو موجود).
+2. لكل باكدج stow: بيمسح الإعدادات الافتراضية المتعارضة في `$HOME` الأول (الـ stow بيرفض يعمل لينك فوق ملف حقيقي)، وبعدين بيعمل stow.
+3. بينسخ `copied/*` جوه `~/.config` (بـ `cp -n`، مش هيستبدل ملفات موجودة).
+4. بيطبّق `system/sddm/*` على `/etc/` و `/usr/share/sddm/themes/silent`، وبشغّل SDDM.
 
 ---
 
-## Advanced notes
+## ملاحظات متقدمة
 
-### Un-stowing / re-stowing a single package
+### فك / إعادة stow لباكدج واحدة بس
 
 ```sh
 cd ~/dotfiles/stow
-stow -D -t "$HOME" waybar    # remove all waybar links (files stay in the repo)
-stow -R -t "$HOME" waybar    # re-create them (after adding files, for example)
+stow -D -t "$HOME" waybar    # شيل كل لينكات waybar (الملفات بتفضل في الريبو)
+stow -R -t "$HOME" waybar    # رجّعها تاني (مثلاً بعد ما ضفت ملفات)
 ```
 
-`stow -D` never deletes repo files — only the links in `$HOME`. That makes it safe to experiment.
+`stow -D` عمريها ما تمسح ملفات الريبو — بتمسح اللينكات بس في `$HOME`. فده آمن للتجريب.
 
-### Stow conflicts (the most common failure)
+### تعارضات stow (أشهر مشكلة)
 
-If you stow and get `CONFLICT: ... existing file ...`, it means a real (non-link) file is sitting where the link should go — usually a default config the program generated. Fix: inspect it, merge anything you want to keep, delete it, stow again. `install.sh` handles this automatically by deleting `.config/<pkg>` defaults before stowing.
+لو عملت stow وطلعلك `CONFLICT: ... existing file ...`، ده معناه إن في ملف حقيقي (مش لينك) قاعد في المكان اللي المفروض اللينك ياخده — غالباً إعداد افتراضي ولّده البرنامج. الحل: افتحه وادمج أي حاجة عايز تحفظها، امسحه، وstow تاني. و`install.sh` بيحل ده تلقائياً بإنه بيمسح إعدادات `.config/<pkg>` الافتراضية قبل الـ stow.
 
-### How the package lists work
+### إزاي قوائم الحزم بتعمل
 
-- `pacman -Qqen` = names of all packages installed from the official repos.
-- `pacman -Qqem` = names of all packages installed from AUR.
-- `install.sh` feeds both straight back into pacman/yay, so a fresh machine converges to the same program set.
-- These lists are **snapshots** — they only know what existed at the last `dotsync`/`sync`. Install something and forget to run it, and that program won't be restored.
+- `pacman -Qqen` = أسماء كل الحزم المثبتة من الريبو الرسمية.
+- `pacman -Qqem` = أسماء كل الحزم المثبتة من AUR.
+- `install.sh` بيمررهم للـ pacman/yay على طول، فالجهاز الجديد بيوصل لنفس مجموعة البرامج.
+- القوائم دي **snapshots** — بتعرق اللي كان موجود لحظة آخر `dotsync`/`sync`. ثبتت حاجة ونستى تشغل السكربت، البرنامج ده مش هيترجع.
 
-### What is deliberately NOT tracked
+### إيه اللي مش متتبع **بالعمد**
 
-- `stow/clipse/` clipboard history, logs and `tmp_files/` — clipboard history is a password leak in waiting.
-- `*.bak`, `*~`, `*.swp` — editor noise.
-- `stow/*/.config/**/stack.toml` — runtime state.
+- تاريخ الـ clipboard واللوجات و `tmp_files/` في `stow/clipse/` — تاريخ النسخ واللصق باب مؤدى عليه للحماية وراح الصبر.
+- `*.bak` و `*~` و `*.swp` — فوضى المحررات.
+- `stow/*/.config/**/stack.toml` — حالة تشغيل (runtime state).
 
-### Why `git`, and what it does NOT do
+### ليه Git، وإيه اللي **مش** بيعمله
 
-Git gives you history (every commit is a restore point) and the GitHub backup. It does **not** push automatically — commit and push are always explicit (`dotgit` / `dotsync`). Saving a file in your editor saves it to disk only.
+Git بيدّيك history (كل commit نقطة رجوع) والنسخة الاحتياطية على GitHub. لكنه **مش** بيرفع تلقائياً — الـ commit والـ push دايماً بيدك (`dotgit` / `dotsync`). حفظ الملف من المحرر بيحفظه على القرص بس.
 
-### Restoring a single config without the full install
+### ترجيع إعداد واحد من غير تنصيب كامل
 
 ```sh
 git clone https://github.com/EbrahimAhmedDev/dotfiles.git ~/dotfiles
-cd ~/dotfiles/stow && stow -t "$HOME" waybar     # just one package
+cd ~/dotfiles/stow && stow -t "$HOME" waybar     # باكدج واحدة بس
 ```
 
 ---
 
-## Troubleshooting
+## حل المشاكل
 
-| Symptom | Cause | Fix |
+| العَرَض | السبب | الحل |
 |---|---|---|
-| `dotsync` asks about a folder every run | You answered `N`, but the folder still exists unmanaged | Expected. Answer `N` forever, or `y` if you actually want it |
-| App changed its config but repo didn't update | App wrote to a `copied/`-style file, or you edited a file stow doesn't own | Check if the file is a symlink (`ls -la ~/.config/<name>`); if it's a real file, move it into the right package yourself or run `sync.sh` |
-| `git status` empty but you "did edit" | The edit never got saved (terminal-typed changes don't edit files) | Edit with an actual editor and save |
-| `CONFLICT` during stow | Real file where a link should be | See [Stow conflicts](#stow-conflicts-the-most-common-failure) |
-| A program "resets" its settings | It overwrites its config; if it's linked, changes still land in the repo — commit after configuring | `dotgit` |
+| `dotsync` بيسأل عن فولدر في كل مرة | ردّت `N` والفولدر لسه موجود غير مُدار | ده طبيعي. ردّ `N` للأبد، أو `y` لو فعلاً عايزه |
+| برنامج عدّل الـ config بس الريبو ما اتحدّثش | البرنامج كتب في ملف من نوع `copied/`، أو عدّلت ملف الـ stow مش مالكه | اتأكد إن الملف لينك (`ls -la ~/.config/<name>`)؛ لو ملف حقيقي، انقله بنفسك للباكدج الصح أو شغّل `sync.sh` |
+| `git status` فاضي رغم إنك "عدّلت" | التعديل عمريه ما اتحفظ (الأوامر المكتوبة في التيرمنال مش بتعدل ملفات) | عدّل بمحرر حقيقي واحفظ |
+| `CONFLICT` وقت الـ stow | ملف حقيقي في مكان اللينك | شوف [تعارضات stow](#تعارضات-stow-أشهر-مشكلة) |
+| برنامج "بيمسح" إعداداته | بيكتب فوق الـ config بتاعه؛ لو ملف لينك التعديلات بتنزل في الريبو برضه — اعمل commit بعد ما تضبطه | `dotgit` |
 
 ---
 
-## What's included
+## اللي جوه الريبو
 
-Hyprland, Waybar, Rofi, SwayNC, wlogout, Mako, Ghostty, Wob, Clipse, Waypaper,
-GTK 3/4, Qt6ct, Fontconfig, Micro, btop, htop, mpv, nwg-displays, nwg-look,
-Starship, Zsh, and the SDDM login screen.
+Hyprland، Waybar، Rofi، SwayNC، wlogout، Mako، Ghostty، Wob، Clipse، Waypaper،
+GTK 3/4، Qt6ct، Fontconfig، Micro، btop، htop، mpv، nwg-displays، nwg-look،
+Starship، Zsh، وشاشة تسجيل الدخول SDDM.
