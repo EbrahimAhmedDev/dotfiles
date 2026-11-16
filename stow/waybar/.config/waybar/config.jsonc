@@ -93,7 +93,8 @@
     },
     "network": {
         "format": "󰤭",
-        "format-wifi": "",
+        "format-wifi": "{icon}",
+        "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
         "format-ethernet": "󰈀",
         "format-disconnected": "󰤭",
         "tooltip-format": "{ifname} via {gwaddr}",

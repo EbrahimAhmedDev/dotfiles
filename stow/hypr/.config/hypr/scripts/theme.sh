@@ -47,6 +47,10 @@ if [ -n "$wp" ]; then
     [ -f "$wpconf" ] && sed -i "s|^wallpaper = .*|wallpaper = $dest|" "$wpconf"
 fi
 
+# 3.5) rofi + wlogout theming (optional per theme)
+[ -f "$src/rofi.rasi" ] && cp "$src/rofi.rasi" "$HOME/.config/rofi/theme.rasi"
+[ -f "$src/wlogout.css" ] && cp "$src/wlogout.css" "$HOME/.config/wlogout/style.css"
+
 # 4) App theme (GTK): declared as mode=dark|light in theme.conf
 mode="dark"
 [ -f "$src/theme.conf" ] && mode=$(grep '^mode=' "$src/theme.conf" | cut -d= -f2 | tr -d '[:space:]')

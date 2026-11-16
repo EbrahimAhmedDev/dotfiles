@@ -37,4 +37,14 @@ else
     notify-send -u critical "Update" "Update failed ✗ (check the errors above)"
     echo "❌ Update failed — check the errors above."
 fi
+
+# .pacnew files: config files that need manual review after updates
+pacnew=$(find /etc -name '*.pacnew' 2>/dev/null | wc -l)
+if [ "$pacnew" -gt 0 ]; then
+    echo
+    echo "⚠️  $pacnew config file(s) need review (.pacnew files)."
+    echo "    Run: sudo pacdiff   (it shows diffs one by one)"
+    notify-send -u critical "Update" "$pacnew .pacnew file(s) need review — run: sudo pacdiff"
+fi
+
 read -rn1 -k "?Press any key to close..."
