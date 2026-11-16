@@ -1,9 +1,5 @@
-@define-color highlight rgba(117, 241, 250, 1);
-@define-color dark-9 rgba(24, 24, 27, 1);
-@define-color dark-8 rgba(39, 39, 42, 1);
-@define-color dark-7 rgba(63, 63, 70, 1);
-@define-color dark-6 rgba(82, 82, 91, 1);
-@define-color dark-5 rgba(113, 113, 122, 1);
+/* Theme colors live in theme.css (rewritten by ~/.config/hypr/scripts/theme.sh, see dotfiles/themes/) */
+@import url("theme.css");
 
 * {
   font-family: "JetBrainsMono Nerd Font Propo", sans-serif;
@@ -13,7 +9,7 @@
 
 window#waybar {
   background-color: @dark-9;
-  color: white;
+  color: @fg;
 }
 
 #workspaces button {
@@ -21,7 +17,7 @@ window#waybar {
   margin: 4px 0 4px 6px;
   background: transparent;
   border-radius: 6px;
-  color: white;
+  color: @fg;
 }
 
 #workspaces button:hover {
@@ -126,7 +122,7 @@ tooltip {
 }
 
 tooltip label {
-  color: white;
+  color: @fg;
 }
 
 #custom-power {
