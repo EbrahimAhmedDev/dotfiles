@@ -1,0 +1,15 @@
+# Editor / temp files
+*.bak
+*~
+*.swp
+
+# Clipboard history & logs (may contain copied passwords/secrets)
+stow/clipse/.config/clipse/clipboard_history.json
+stow/clipse/.config/clipse/*.log
+stow/clipse/.config/clipse/tmp_files/
+
+# Stow noise
+stow/*/.config/**/stack.toml
+
+# System-specific state
+copied/

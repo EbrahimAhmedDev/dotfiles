@@ -1,0 +1,152 @@
+@define-color bg-main rgba(24, 24, 27, 0.96);
+@define-color bg-card rgba(39, 39, 42, 0.92);
+@define-color bg-hover rgba(63, 63, 70, 0.95);
+@define-color border-subtle rgba(117, 241, 250, 0.25);
+@define-color accent #75f1fa;
+@define-color danger #e35149;
+@define-color text-main #ffffff;
+@define-color text-muted #a1a1aa;
+
+/* Global */
+* {
+  font-family: "JetBrainsMono Nerd Font Propo", sans-serif;
+  font-size: 12px;
+  color: @text-main;
+}
+
+/* Hide Scrollbars */
+scrollbar,
+scrollbar slider,
+scrollbar trough {
+  opacity: 0;
+  min-width: 0;
+  min-height: 0;
+  background: transparent;
+}
+
+/* Control Center */
+.control-center {
+  background: @bg-main;
+  border: 1.5px solid @border-subtle;
+  border-radius: 14px;
+  padding: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+}
+
+/* Notification List */
+.control-center-list {
+  background: transparent;
+}
+
+/* Empty State */
+.control-center-list-placeholder {
+  color: @text-muted;
+  margin: 4px 0;
+  padding: 2px;
+}
+
+/* Title */
+.widget-title {
+  margin: 2px 4px 6px 4px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.widget-title > button {
+  background: @bg-card;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 11px;
+}
+
+.widget-title > button:hover {
+  background: @danger;
+  color: #000000;
+}
+
+/* Do Not Disturb */
+.widget-dnd {
+  background: @bg-card;
+  border-radius: 10px;
+  padding: 5px 10px;
+  margin: 0 0 6px 0;
+  font-weight: 600;
+}
+
+.widget-dnd > switch {
+  background: @bg-hover;
+  border-radius: 12px;
+  min-width: 36px;
+  min-height: 18px;
+}
+
+.widget-dnd > switch:checked {
+  background: @accent;
+}
+
+.widget-dnd > switch slider {
+  background: #ffffff;
+  border-radius: 50%;
+}
+
+/* Notifications */
+.notification-row {
+  outline: none;
+  background: transparent;
+  margin: 2px 0;
+  padding: 0;
+}
+
+.notification {
+  background: @bg-card;
+  border: 1px solid @border-subtle;
+  border-radius: 10px;
+  padding: 6px 10px;
+  box-shadow: none;
+}
+
+.notification-content {
+  background: transparent;
+  padding: 0;
+}
+
+.notification.critical {
+  border-color: @danger;
+}
+
+/* Summary */
+.summary {
+  font-weight: bold;
+  font-size: 12px;
+  color: @accent;
+}
+
+/* Time */
+.time {
+  font-size: 10px;
+  color: @text-muted;
+  margin-right: 28px;
+}
+
+/* Body */
+.body {
+  font-size: 11px;
+  color: @text-main;
+  margin-top: 2px;
+}
+
+/* Close Button */
+.close-button {
+  background: rgba(255, 255, 255, 0.1);
+  color: @text-main;
+  border-radius: 50%;
+  min-width: 18px;
+  min-height: 18px;
+  margin: 2px;
+}
+
+.close-button:hover {
+  background: @danger;
+  color: #000000;
+}
