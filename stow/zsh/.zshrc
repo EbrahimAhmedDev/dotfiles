@@ -45,6 +45,8 @@ alias ll='eza -l --color=auto --icons=auto'
 alias la='eza -lah --color=auto --icons=auto'
 alias lt='eza -T --color=auto --icons=auto'
 
+# ---------- Dotfiles Helper ----------
+alias dotgit='cd ~/dotfiles && git add -A && git commit -m "update $(date +%F)" && git push'
 
 # ---------- Custom Zsh Plugins Auto-Loader ----------
 if [ -d "$HOME/.config/zsh/plugins" ]; then
