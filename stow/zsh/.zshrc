@@ -48,6 +48,7 @@ alias lt='eza -T --color=auto --icons=auto'
 # ---------- Dotfiles Helper ----------
 alias dotgit='cd ~/dotfiles && git add -A && git commit -m "update $(date +%F)" && git push'
 alias dotsync="$HOME/dotfiles/scripts/dotsync.sh"
+alias dotupdate="$HOME/dotfiles/scripts/dotupdate.sh"
 
 # ---------- Custom Zsh Plugins Auto-Loader ----------
 if [ -d "$HOME/.config/zsh/plugins" ]; then

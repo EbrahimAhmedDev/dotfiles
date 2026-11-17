@@ -28,6 +28,14 @@
 
   "notification-grouping": false,
 
+  "scripts": {
+    "notification-sound": {
+      "exec": "$HOME/.config/hypr/scripts/notify-sound.sh",
+      "notification_id": -1,
+      "run-on": "recevied"
+    }
+  },
+
   "timeout": 5,
   "timeout-low": 3,
   "timeout-critical": 0,
