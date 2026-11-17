@@ -29,6 +29,22 @@ Run it inside the session to try it live. Kill it any time with
 - Quickshell runs its own greeter/lock if configured — do NOT enable DMS lock
   while testing unless ready to debug; the current hyprlock setup stays.
 
+## Adopted on this branch (try-dux-shell)
+- autostart: `dms run` instead of waybar / swaync / wob / waypaper / clipse
+- keybinds remapped to DMS IPC:
+  - SUPER+S / SUPER+SHIFT+S → DMS spotlight launcher (was rofi)
+  - SUPER+V → DMS clipboard (was clipse)
+  - SUPER+P → DMS power menu (was wlogout)
+  - XF86 volume/brightness/mic → DMS audio + brightness IPC (DMS OSD)
+  - media keys → DMS MPRIS (was playerctl)
+  - SUPER+N → DMS night mode (was nightlight.sh)
+  - kept: SUPER+CTRL+S custom control menu (rofi), OCR, screenshots, lock via
+    hyprlock (stable, crash-fixed) — DMS lock is NOT enabled for now
+- dms-vol.sh wrapper keeps the user's click sound + sounds.conf volume on
+  volume keys while DMS handles the OSD
+- waybar/swaync/wob/theme files remain in the repo but unused while DMS runs
+- rollback: see below, or `git checkout main`
+
 ## Rollback
 Everything here is a manual process — no dotfiles paths are changed by the
 install. If unhappy:

@@ -10,22 +10,22 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("ghostty"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("google-chrome-stable"))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("spotify"))
 hl.bind(secondMod .. " + F", hl.dsp.exec_cmd("dolphin"))
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("rofi -show drun -show-icons"))
-hl.bind(secondMod .. " + S", hl.dsp.exec_cmd("rofi -show run"))
+-- Dux Shell (DMS): launcher (was rofi drun/run)
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("dms ipc call spotlight toggle"))
+hl.bind(secondMod .. " + S", hl.dsp.exec_cmd("dms ipc call spotlight openWith apps"))
 hl.bind(thirdMod .. " + S", hl.dsp.exec_cmd(scripts .. "control.sh")) -- قائمة التحكم المركزية
 hl.bind(secondMod .. " + O", hl.dsp.exec_cmd(scripts .. "ocr.sh")) -- OCR: نص من جزء الشاشة
 
--- Clipboard history (clipse)
-hl.bind(mainMod .. " + V",
-    hl.dsp.exec_cmd("ghostty --class=com.clipse.tui --gtk-single-instance=false -e clipse",
-        { float = true, size = { 522, 552 }, stay_focused = true }))
+-- Dux Shell (DMS): clipboard manager (was clipse)
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("dms ipc call clipboard toggle"))
 
 -- Window and session control
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" }))
 hl.bind(secondMod .. " + T", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("loginctl lock-session"))
-hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("wlogout"))
+-- Dux Shell (DMS): power menu (was wlogout)
+hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("dms ipc call powermenu toggle"))
 hl.bind(thirdMod .. " + Q", hl.dsp.exit())
 
 -- Focus
@@ -60,18 +60,20 @@ end
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
--- Volume and brightness (with on-screen bar)
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(osd .. " vol-up"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(osd .. " vol-down"), { locked = true, repeating = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd(osd .. " mute"), { locked = true })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(osd .. " mic-mute"), { locked = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(osd .. " bright-up"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(osd .. " bright-down"), { locked = true, repeating = true })
+-- Volume and brightness — Dux Shell (DMS) audio/brightness IPC with its own OSD
+-- (wrapped so the user's click sound still plays on volume changes)
+local dmvol = scripts .. "dms-vol.sh"
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(dmvol .. " up"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(dmvol .. " down"), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd(dmvol .. " mute"), { locked = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(dmvol .. " mic"), { locked = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("dms ipc call brightness increment 5"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("dms ipc call brightness decrement 5"), { locked = true, repeating = true })
 
--- Media keys
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+-- Media keys — via DMS MPRIS control
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("dms ipc call mpris playPause"), { locked = true })
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("dms ipc call mpris next"), { locked = true })
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("dms ipc call mpris previous"), { locked = true })
 
 -- Screenshots and recording
 -- Print: area (Satty) | Shift+Print: full screen | Super+Print: recording
@@ -80,6 +82,7 @@ hl.bind("SHIFT + Print", hl.dsp.exec_cmd(scripts .. "screenshot.sh full"))
 hl.bind("SUPER + Print", hl.dsp.exec_cmd("kooha"))
 
 -- Utilities
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(scripts .. "nightlight.sh"))
+-- Dux Shell (DMS): night light (was nightlight.sh)
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("dms ipc call night toggle"))
 hl.bind(secondMod .. " + C", hl.dsp.exec_cmd("hyprpicker -a"))
 hl.bind("XF86Tools", hl.dsp.exec_cmd("hyprmod")) -- Fn + F9
