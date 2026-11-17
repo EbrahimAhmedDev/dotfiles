@@ -1,9 +1,9 @@
 * {
-    bg: rgba(24, 24, 27, 0.94);
-    bg-alt: rgba(39, 39, 42, 0.9);
-    fg: #ffffff;
-    accent: #75f1fa;
-    border-color: rgba(117, 241, 250, 0.35);
+    bg: rgba(244, 244, 245, 0.94);
+    bg-alt: rgba(228, 228, 231, 0.9);
+    fg: #18181b;
+    accent: #2563eb;
+    border-color: rgba(37, 99, 235, 0.35);
 }
 
 window {
@@ -47,7 +47,7 @@ entry {
     background-color: transparent;
     text-color: @fg;
     placeholder: "Search applications...";
-    placeholder-color: rgba(161, 161, 170, 0.6);
+    placeholder-color: rgba(113, 113, 122, 0.6);
 }
 
 listview {
@@ -71,7 +71,7 @@ element {
 
 element selected.normal {
     background-color: @accent;
-    text-color: #000000;
+    text-color: #ffffff;
 }
 
 element-icon {
