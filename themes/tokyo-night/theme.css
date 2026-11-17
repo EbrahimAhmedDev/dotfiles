@@ -1,0 +1,11 @@
+/* Tokyo Night (Day) — فاتح ناعم بأزرق عميق، بدون أبيض جامد */
+@define-color highlight rgba(46, 125, 233, 1);   /* #2e7de9 */
+@define-color dark-9 rgba(225, 226, 231, 1);     /* #e1e2e7 */
+@define-color dark-8 rgba(213, 214, 219, 1);     /* #d5d6db */
+@define-color dark-7 rgba(196, 200, 218, 1);     /* #c4c8da */
+@define-color dark-6 rgba(137, 144, 179, 1);     /* #8990b3 */
+@define-color dark-5 rgba(97, 114, 176, 1);      /* #6172b0 */
+@define-color fg rgba(55, 96, 191, 1);           /* #3760bf */
+@define-color warn rgba(177, 92, 0, 1);          /* #b15c00 */
+@define-color good rgba(88, 117, 57, 1);         /* #587539 */
+@define-color on-highlight rgba(255, 255, 255, 1);
