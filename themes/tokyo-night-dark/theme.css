@@ -1,0 +1,11 @@
+/* Tokyo Night (Dark) — الكحلي الغامق الكلاسيكي مع أزرق طوكيو */
+@define-color highlight rgba(122, 162, 247, 1);  /* #7aa2f7 */
+@define-color dark-9 rgba(26, 27, 38, 1);        /* #1a1b26 */
+@define-color dark-8 rgba(36, 40, 59, 1);        /* #24283b */
+@define-color dark-7 rgba(47, 51, 77, 1);        /* #2f334d */
+@define-color dark-6 rgba(86, 95, 137, 1);       /* #565f89 */
+@define-color dark-5 rgba(115, 122, 162, 1);     /* #737aa2 */
+@define-color fg rgba(192, 202, 245, 1);         /* #c0caf5 */
+@define-color warn rgba(224, 175, 104, 1);       /* #e0af68 */
+@define-color good rgba(158, 206, 106, 1);       /* #9ece6a */
+@define-color on-highlight rgba(26, 27, 38, 1);
