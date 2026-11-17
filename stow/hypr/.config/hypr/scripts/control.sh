@@ -12,6 +12,7 @@ choice=$(rofi -dmenu -i -p "Control" <<'EOF'
 🔄  Update System
 🌙  Night Light
 📋  Clipboard
+✂️  Extract Text from Screen (OCR)
 🔒  Lock Screen
 ⏻  Power Menu
 ℹ️  About
@@ -30,6 +31,7 @@ case "$choice" in
     *Update*)       exec ghostty -e "$HOME/dotfiles/scripts/dotupdate.sh" ;;
     *Night*)        exec "$scripts/nightlight.sh" ;;
     *Clipboard*)    exec ghostty --class=com.clipse.tui --gtk-single-instance=false -e clipse ;;
+    *Extract*|*OCR*) exec "$scripts/ocr.sh" ;;
     *Lock*)         exec loginctl lock-session ;;
     *Power*|*Logout*) exec wlogout ;;
     *About*)        exec ghostty -e fastfetch ;;
