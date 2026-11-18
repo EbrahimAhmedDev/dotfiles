@@ -5,7 +5,6 @@
 exec python3 - "$@" <<'PY'
 import configparser, glob, os, re, shlex, subprocess, sys
 
-ROFI_BASE = ["rofi", "-dmenu", "-i", "-show-icons", "-format", "i"]
 
 CAT_ICONS = {
     "Development": "applications-development",
@@ -77,9 +76,12 @@ def load_apps():
     rows.sort(key=lambda r: (r[0] != "Other", r[0].lower(), r[1].lower()))
     return rows
 
-def rofi_pick(prompt, entries, mesg, width="48%"):
-    """entries: list of (display, icon). Returns index or None (Esc)."""
-    args = ROFI_BASE + ["-p", prompt, "-theme-str", f"window {{ width: {width}; }}"]
+def rofi_pick(prompt, entries, mesg, width="480px", fmt="i", extra=None):
+    """entries: list of (display, icon). Returns rofi output per fmt, or None (Esc)."""
+    args = ["rofi", "-dmenu", "-i", "-show-icons", "-format", fmt,
+            "-p", prompt, "-theme-str", f"window {{ width: {width}; }}"]
+    if extra:
+        args += extra
     if mesg:
         args += ["-mesg", mesg]
     data = "".join(
@@ -88,10 +90,13 @@ def rofi_pick(prompt, entries, mesg, width="48%"):
                        stderr=subprocess.DEVNULL)
     if p.returncode != 0 or not p.stdout.strip():
         return None
-    try:
-        return int(p.stdout.strip())
-    except ValueError:
-        return None
+    out = p.stdout.decode(errors="replace").strip()
+    if fmt == "i":
+        try:
+            return int(out)
+        except ValueError:
+            return None
+    return out
 
 def launch(exe, terminal):
     if terminal:
@@ -125,24 +130,37 @@ if any(c == "Other" for c, *_ in rows):
     cats.append("Other")
 cat_counts = {c: sum(1 for r in rows if r[0] == c) for c in cats}
 
+def show_search(text):
+    subprocess.run(["rofi", "-show", "drun", "-filter", text])
+    sys.exit(0)
+
 level = "cats"
 while True:
     if level == "cats":
         entries = [(SEARCH, "system-search")]
         entries += [(f"{c}  ({cat_counts[c]})", CAT_ICONS.get(c, "applications-other"))
                     for c in cats]
-        idx = rofi_pick("Apps", entries, "Pick a category — Enter to search all apps")
-        if idx is None:
+        by_display = {d: i for i, (d, _) in enumerate(entries)}
+        # -format s so typed text that matches no category = search all apps
+        out = rofi_pick("Apps", entries,
+                        "Pick a category — or type any text to search all apps",
+                        width="480px", fmt="s")
+        if out is None:
             sys.exit(0)
-        if idx == 0:                      # full search fallback
-            subprocess.run(["rofi", "-show", "drun"])
-            sys.exit(0)
-        current = cats[idx - 1]
-        level = "apps"
+        if out in by_display:
+            idx = by_display[out]
+            if idx == 0:                    # "All Applications" → search
+                show_search("")
+            current = cats[idx - 1]
+            level = "apps"
+        else:
+            show_search(out)                # typed text → search all apps
     else:
         apps = [(n, ic) for c, n, ic, *_ in rows if c == current]
-        idx = rofi_pick(current, apps, f"{len(apps)} apps — Esc to go back")
-        if idx is None:                   # back to categories
+        idx = rofi_pick(current, apps,
+                        f"{len(apps)} apps — Esc to go back",
+                        width="560px", fmt="i", extra=["-no-custom"])
+        if idx is None:                     # back to categories
             level = "cats"
             continue
         target = next(r for r in rows if r[0] == current and r[1] == apps[idx][0])
