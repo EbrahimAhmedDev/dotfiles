@@ -80,6 +80,6 @@ hl.bind("SHIFT + Print", hl.dsp.exec_cmd(scripts .. "screenshot.sh full"))
 hl.bind("SUPER + Print", hl.dsp.exec_cmd("kooha"))
 
 -- Utilities
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(scripts .. "nightlight.sh"))
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(scripts .. "keybinds.sh")) -- keybinds cheat sheet
 hl.bind(secondMod .. " + C", hl.dsp.exec_cmd("hyprpicker -a"))
 hl.bind("XF86Tools", hl.dsp.exec_cmd("hyprmod")) -- Fn + F9

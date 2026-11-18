@@ -34,5 +34,5 @@ case "$choice" in
     *Extract*|*OCR*) exec "$scripts/ocr.sh" ;;
     *Lock*)         exec loginctl lock-session ;;
     *Power*|*Logout*) exec wlogout ;;
-    *About*)        exec ghostty -e fastfetch ;;
+    *About*)        exec ghostty -e bash -c 'fastfetch; echo; read -rsn1 -p "Press any key to close..."' ;;
 esac

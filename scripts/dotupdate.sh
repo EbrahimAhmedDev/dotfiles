@@ -14,7 +14,7 @@ total=$((repos + aur))
 if [ "$total" -eq 0 ]; then
     echo "✅ No updates available — system is fully up to date."
     notify-send "Update" "No updates available ✓"
-    read -rn1 -k "?Press any key to close..."
+    read -rsn1 -p "Press any key to close..."
     exit 0
 fi
 
@@ -47,4 +47,4 @@ if [ "$pacnew" -gt 0 ]; then
     notify-send -u critical "Update" "$pacnew .pacnew file(s) need review — run: sudo pacdiff"
 fi
 
-read -rn1 -k "?Press any key to close..."
+read -rsn1 -p "Press any key to close..."
