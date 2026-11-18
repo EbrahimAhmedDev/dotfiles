@@ -15,6 +15,7 @@ choice=$(rofi -dmenu -i -p "Control" <<'EOF'
 ✂️  Extract Text from Screen (OCR)
 🔒  Lock Screen
 ⏻  Power Menu
+⌨  Keybinds
 ℹ️  About
 EOF
 ) || exit 0
@@ -34,5 +35,6 @@ case "$choice" in
     *Extract*|*OCR*) exec "$scripts/ocr.sh" ;;
     *Lock*)         exec loginctl lock-session ;;
     *Power*|*Logout*) exec wlogout ;;
+    *Keybind*)      exec "$scripts/keybinds.sh" ;;
     *About*)        exec ghostty -e bash -c 'fastfetch; echo; read -rsn1 -p "Press any key to close..."' ;;
 esac

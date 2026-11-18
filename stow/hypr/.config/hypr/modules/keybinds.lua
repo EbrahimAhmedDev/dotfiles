@@ -10,7 +10,7 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("ghostty"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("google-chrome-stable"))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("spotify"))
 hl.bind(secondMod .. " + F", hl.dsp.exec_cmd("dolphin"))
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("rofi -show drun -show-icons"))
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd(scripts .. "appmenu.sh")) -- App launcher (categories)
 hl.bind(secondMod .. " + S", hl.dsp.exec_cmd("rofi -show run"))
 hl.bind(thirdMod .. " + S", hl.dsp.exec_cmd(scripts .. "control.sh")) -- قائمة التحكم المركزية
 hl.bind(secondMod .. " + O", hl.dsp.exec_cmd(scripts .. "ocr.sh")) -- OCR: نص من جزء الشاشة
