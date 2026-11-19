@@ -10,5 +10,6 @@ require("modules.autostart")
 require("modules.appearance")
 require("modules.keybinds")
 require("modules.rules")
+require("modules.float")
 
 require("hyprland-gui")

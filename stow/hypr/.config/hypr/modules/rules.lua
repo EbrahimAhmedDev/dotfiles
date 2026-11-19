@@ -13,3 +13,10 @@ floating("nm-editor-floating", { class = "nm-connection-editor" }, 750, 500)
 floating("nmrs-floating", { class = "(?i).*nmrs.*" }, 780, 520)
 floating("monitors-floating", { title = "^(btop|htop|nmtui|pulsemixer)$" }, 820, 510)
 floating("satty-floating", { class = "com.gabm.satty" }, 800, 600)
+
+-- Distinct outline for every floating window so they are recognizable
+hl.window_rule({
+    name = "floating-outline",
+    match = { float = true },
+    border_color = "rgba(ff9f00ff)", -- amber
+})
