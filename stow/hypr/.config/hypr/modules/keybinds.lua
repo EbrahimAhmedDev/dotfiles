@@ -53,8 +53,8 @@ hl.bind(thirdMod .. " + R", hl.dsp.layout("splitratio 1 exact"))
 local function move_floating(dx, dy)
     return function()
         for _, w in ipairs(hl.get_windows()) do
-            if w.active and w.floating then
-                hl.dsp.window.move({ x = dx, y = dy, relative = true })
+            if w.active and w.floating and w.fullscreen == 0 then
+                hl.dispatch(hl.dsp.window.move({ x = dx, y = dy, relative = true }))
                 return
             end
         end
