@@ -61,10 +61,10 @@ local function move_floating(dx, dy)
     end
 end
 
-hl.bind(mainMod .. " + ALT + left", move_floating(-20, 0), { repeating = true })
-hl.bind(mainMod .. " + ALT + right", move_floating(20, 0), { repeating = true })
-hl.bind(mainMod .. " + ALT + up", move_floating(0, -20), { repeating = true })
-hl.bind(mainMod .. " + ALT + down", move_floating(0, 20), { repeating = true })
+hl.bind(mainMod .. " + ALT + left", move_floating(-40, 0), { repeating = true })
+hl.bind(mainMod .. " + ALT + right", move_floating(40, 0), { repeating = true })
+hl.bind(mainMod .. " + ALT + up", move_floating(0, -40), { repeating = true })
+hl.bind(mainMod .. " + ALT + down", move_floating(0, 40), { repeating = true })
 
 -- Workspaces 1-9
 for i = 1, 9 do
