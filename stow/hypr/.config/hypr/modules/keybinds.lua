@@ -50,11 +50,21 @@ hl.bind(thirdMod .. " + down", hl.dsp.window.resize({ x = 0, y = 40, relative = 
 hl.bind(thirdMod .. " + R", hl.dsp.layout("splitratio 1 exact"))
 
 -- Move floating window freely (SUPER + ALT + arrows), like SUPER + mouse drag
+-- The window is clamped to the screen bounds so it can never move off-screen
 local function move_floating(dx, dy)
     return function()
         for _, w in ipairs(hl.get_windows()) do
             if w.active and w.floating and w.fullscreen == 0 then
-                hl.dispatch(hl.dsp.window.move({ x = dx, y = dy, relative = true }))
+                local at, sz, mon = w.at, w.size, w.monitor
+                local scale = mon.scale or 1
+                local sx, sy = mon.x, mon.y
+                local sw, sh = mon.width / scale, mon.height / scale
+                local nx = math.max(sx, math.min(at.x + dx, sx + sw - sz.x))
+                local ny = math.max(sy, math.min(at.y + dy, sy + sh - sz.y))
+                local rx, ry = nx - at.x, ny - at.y
+                if rx ~= 0 or ry ~= 0 then
+                    hl.dispatch(hl.dsp.window.move({ x = rx, y = ry, relative = true }))
+                end
                 return
             end
         end
