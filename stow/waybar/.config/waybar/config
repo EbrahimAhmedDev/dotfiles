@@ -4,7 +4,7 @@
     "spacing": 2,
     "modules-left": [
         "hyprland/workspaces",
-        "group/media"
+        "mpris"
     ],
     "modules-center": [
         "clock"
@@ -140,33 +140,23 @@
             "pulseaudio/slider"
         ]
     },
-    "group/media": {
-        "orientation": "horizontal",
-        "modules": [
-            "custom/media-animation",
-            "custom/media-now-playing",
-            "custom/media-time"
-        ]
-    },
-    "custom/media-now-playing": {
-        "exec": "~/.config/waybar/custom_modules/media/media-now-playing.sh",
+    "mpris": {
         "interval": 1,
-        "max-length": 25,
-        "escape": true,
-        "tooltip": false,
+        "format": "{status_icon} {dynamic}",
+        "format-paused": "{status_icon} <i>{dynamic}</i>",
+        "format-stopped": "",
+        "max-length": 40,
+        "title-len": 22,
+        "dynamic-len": 38,
+        "dynamic-order": ["title", "artist", "position"],
+        "status-icons": {
+            "playing": "󰐊",
+            "paused": "⏸",
+            "stopped": ""
+        },
         "on-click": "playerctl play-pause",
         "on-click-middle": "playerctl previous",
         "on-click-right": "playerctl next"
-    },
-    "custom/media-animation": {
-        "exec": "~/.config/waybar/custom_modules/media/media-animation.sh",
-        "tooltip": false
-    },
-    "custom/media-time": {
-        "exec": "~/.config/waybar/custom_modules/media/media-time.sh",
-        "escape": true,
-        "interval": 1,
-        "tooltip": false
     },
     "custom/notification": {
         "tooltip": false,
