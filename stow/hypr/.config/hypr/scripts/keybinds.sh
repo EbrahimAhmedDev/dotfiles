@@ -28,7 +28,6 @@ KEYLABEL = {
 # command → English description (first match wins)
 EXEC_DESCS = [
     (r"^ghostty$", "Terminal (Ghostty)"),
-    (r"appmenu\.sh", "App launcher (categories)"),
     (r"rofi -show drun", "App launcher (rofi)"),
     (r"rofi -show run", "Run a command (rofi)"),
     (r"control\.sh", "Control menu (themes, OCR, update, power)"),
@@ -182,6 +181,24 @@ for stmt in statements:
         continue
 
     code, inline_raw = split_comment(stmt)
+
+    # helper binds: hl.bind(combo, move_floating(dx, dy), { repeating = true })
+    fm = re.match(r"\s*hl\.bind\(\s*(.*?)\s*,\s*move_floating\(\s*(-?\d+)\s*,\s*(-?\d+)\s*\)", code, re.S)
+    if fm:
+        combo = ev(fm.group(1))
+        if combo:
+            dx, dy = int(fm.group(2)), int(fm.group(3))
+            direction = ("Left" if dx < 0 else "Right") if dx else ("Up" if dy < 0 else "Down")
+            if pending:
+                out.append(("H", pending))
+                pending = None
+            for k, v in KEYLABEL.items():
+                if combo == k:
+                    combo = v
+            combo = re.sub(r"(?<=\+ )([a-z])", lambda x: x.group(1).upper(), combo)
+            out.append((combo, "Move floating window: " + direction))
+        continue
+
     m = re.match(r"\s*hl\.bind\((.*),\s*hl\.dsp\.(.*)\)\s*$", code, re.S)
     if not m:
         continue

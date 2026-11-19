@@ -31,14 +31,14 @@ cd ~/dotfiles && ./scripts/install.sh
 `stow` takes a folder of configs (a "package") and creates **symlinks** from your `$HOME` into it. Nothing is copied — your `~/.config/waybar` is literally a link into this repo.
 
 ```
-~/.config/waybar/config.jsonc          ← symlink (a shortcut, not a real file)
+~/.config/waybar/config                 ← symlink (a shortcut, not a real file)
         │
-        └──→  ~/dotfiles/stow/waybar/.config/waybar/config.jsonc   ← the real file
+        └──→  ~/dotfiles/stow/waybar/.config/waybar/config        ← the real file
 ```
 
 ### What this buys you
 
-- **Edit from anywhere.** Opening `~/.config/waybar/config.jsonc` and editing it *is* editing the repo file. There is no "sync step" and no copy to forget.
+- **Edit from anywhere.** Opening `~/.config/waybar/config` and editing it *is* editing the repo file. There is no "sync step" and no copy to forget.
 - **One backup location.** The repo contains every config; `git push` backs up all of it.
 - **Atomic removal.** Un-stowing a package removes all its links at once, leaving no crumbs.
 

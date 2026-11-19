@@ -10,7 +10,7 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("ghostty"))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("google-chrome-stable"))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("spotify"))
 hl.bind(secondMod .. " + F", hl.dsp.exec_cmd("dolphin"))
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd(scripts .. "appmenu.sh")) -- App launcher (categories)
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("rofi -show drun -show-icons")) -- App launcher
 hl.bind(secondMod .. " + S", hl.dsp.exec_cmd("rofi -show run"))
 hl.bind(thirdMod .. " + S", hl.dsp.exec_cmd(scripts .. "control.sh")) -- قائمة التحكم المركزية
 hl.bind(secondMod .. " + O", hl.dsp.exec_cmd(scripts .. "ocr.sh")) -- OCR: نص من جزء الشاشة
@@ -48,6 +48,23 @@ hl.bind(thirdMod .. " + down", hl.dsp.window.resize({ x = 0, y = 40, relative = 
 
 -- Reset split ratio (back to 50/50)
 hl.bind(thirdMod .. " + R", hl.dsp.layout("splitratio 1 exact"))
+
+-- Move floating window freely (SUPER + ALT + arrows), like SUPER + mouse drag
+local function move_floating(dx, dy)
+    return function()
+        for _, w in ipairs(hl.get_windows()) do
+            if w.active and w.floating then
+                hl.dsp.window.move({ x = dx, y = dy, relative = true })
+                return
+            end
+        end
+    end
+end
+
+hl.bind(mainMod .. " + ALT + left", move_floating(-20, 0), { repeating = true })
+hl.bind(mainMod .. " + ALT + right", move_floating(20, 0), { repeating = true })
+hl.bind(mainMod .. " + ALT + up", move_floating(0, -20), { repeating = true })
+hl.bind(mainMod .. " + ALT + down", move_floating(0, 20), { repeating = true })
 
 -- Workspaces 1-9
 for i = 1, 9 do
