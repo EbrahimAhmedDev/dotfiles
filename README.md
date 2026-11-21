@@ -44,7 +44,7 @@ cd ~/dotfiles && ./scripts/install.sh
 
 ### الملفات اللي مينفعش تتعملها لينك (استثناء `copied/`)
 
-بعض البرامج بترفض تتبع الـ symlinks، أو بتعيد كتابة الملف مكان اللينك فبتكسره (برامج KDE زي `kdeglobals` و `dolphinrc`، و `mimeapps.list`، و `user-dirs.dirs`...). دي بتتعيش في `copied/` وبيتنسخوا **نسخ** جوه `~/.config` بواسطة `install.sh` بدل الـ linking. وسكربت `sync.sh` بيحدّثهم من جهازك الحقيقي.
+بعض البرامج بترفض تتبع الـ symlinks، أو بتعيد كتابة الملف مكان اللينك فبتكسره (برامج KDE زي `kdeglobals` و `dolphinrc`، و `mimeapps.list`). دي بتتعيش في `copied/` وبيتنسخوا **نسخ** جوه `~/.config` بواسطة `install.sh` بدل الـ linking. وسكربت `sync.sh` بيحدّثهم من جهازك الحقيقي.
 
 ### الملفات اللي برة الـ home (استثناء `system/`)
 

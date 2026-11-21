@@ -44,7 +44,7 @@ cd ~/dotfiles && ./scripts/install.sh
 
 ### Files that can't be linked (the `copied/` exception)
 
-Some programs refuse to follow symlinks, or rewrite the file in place and destroy the link (KDE apps like `kdeglobals`/`dolphinrc`, `mimeapps.list`, `user-dirs.dirs`...). Those live in `copied/` and are **copied** into `~/.config` by `install.sh` instead of linked. `sync.sh` refreshes them from your live system.
+Some programs refuse to follow symlinks, or rewrite the file in place and destroy the link (KDE apps like `kdeglobals`/`dolphinrc`, `mimeapps.list`). Those live in `copied/` and are **copied** into `~/.config` by `install.sh` instead of linked. `sync.sh` refreshes them from your live system.
 
 ### Files outside your home (the `system/` exception)
 

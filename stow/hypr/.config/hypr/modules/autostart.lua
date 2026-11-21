@@ -14,5 +14,5 @@ hl.on("hyprland.start", function()
 
     -- On-screen bar for volume and brightness (wob reads from a fifo)
     hl.exec_cmd(
-        [[sh -c 'rm -f "$XDG_RUNTIME_DIR/wob.sock"; mkfifo "$XDG_RUNTIME_DIR/wob.sock"; tail -f "$XDG_RUNTIME_DIR/wob.sock" | wob']])
+        [[sh -c 'rm -f "$XDG_RUNTIME_DIR/wob.sock"; mkfifo "$XDG_RUNTIME_DIR/wob.sock"; while true; do tail -f "$XDG_RUNTIME_DIR/wob.sock" | wob; sleep 0.2; done']])
 end)

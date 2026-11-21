@@ -1,9 +1,9 @@
 -- modules/float.lua
--- When a tiled window becomes floating: shrink it to 50% of the screen and
+-- When a tiled window becomes floating: shrink it to 60% of the screen and
 -- center it, so a floating window never looks like a maximized one.
 -- (Floating outline color lives in rules.lua -> floating-outline rule.)
 
-local SCREEN_FILL = 0.5 -- 50% of the monitor
+local SCREEN_FILL = 0.6 -- 60% of the monitor
 
 local was_float = {}
 
@@ -31,7 +31,7 @@ local function shrink_if_newly_floating(w)
     local tw = math.floor(mon.width / scale * SCREEN_FILL)
     local th = math.floor(mon.height / scale * SCREEN_FILL)
     local sz = w.size
-    -- shrink only if bigger than 50% (never enlarge a small window),
+    -- shrink only if bigger than 60% (never enlarge a small window),
     -- but always center the floating window on the screen
     if sz and (sz.x > tw or sz.y > th) then
         hl.dispatch(hl.dsp.window.resize({ x = tw, y = th }))

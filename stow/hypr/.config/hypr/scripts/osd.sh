@@ -70,22 +70,22 @@ esac
 case "$1" in
     vol-*|mute)
         if wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -q MUTED; then
-            echo "0 $BG $MUTE_COLOR $MUTE_COLOR" > "$WOB"
+            echo "0 muted" > "$WOB"
         else
             v=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2 * 100 + 0.5)}')
-            echo "$v $BG $VOL_COLOR $VOL_COLOR" > "$WOB"
+            echo "$v" > "$WOB"
         fi
         ;;
     mic-mute)
         if wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED; then
-            echo "0 $BG $MUTE_COLOR $MUTE_COLOR" > "$WOB"
+            echo "0 muted" > "$WOB"
         else
             v=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | awk '{print int($2 * 100 + 0.5)}')
-            echo "$v $BG $VOL_COLOR $VOL_COLOR" > "$WOB"
+            echo "$v mic" > "$WOB"
         fi
         ;;
     bright-*)
         b=$(( $(brightnessctl get) * 100 / $(brightnessctl max) ))
-        echo "$b $BG $BRIGHT_COLOR $BRIGHT_COLOR" > "$WOB"
+        echo "$b brightness" > "$WOB"
         ;;
 esac

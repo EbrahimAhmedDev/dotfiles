@@ -8,7 +8,7 @@ mkdir -p "$dot"/{packages,copied,system}
 pacman -Qqen > "$dot/packages/official.txt"
 pacman -Qqem > "$dot/packages/aur.txt"
 
-for f in kdeglobals dolphinrc mimeapps.list user-dirs.dirs pavucontrol.ini; do
+for f in kdeglobals dolphinrc mimeapps.list; do
     [ -f "$cfg/$f" ] && cp -a "$cfg/$f" "$dot/copied/"
 done
 

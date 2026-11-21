@@ -18,5 +18,5 @@ floating("satty-floating", { class = "com.gabm.satty" }, 800, 600)
 hl.window_rule({
     name = "floating-outline",
     match = { float = true },
-    border_color = "rgba(ff9f00ff)", -- amber
+    border_color = "rgba(ff7a00ff)", -- orange
 })
