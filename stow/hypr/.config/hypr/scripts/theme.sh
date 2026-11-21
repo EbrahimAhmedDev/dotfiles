@@ -35,6 +35,37 @@ if [ -z "$name" ] || [ ! -d "$THEMES_DIR/$name" ]; then
     exit 1
 fi
 src="$THEMES_DIR/$name"
+printf '%s\n' "$name" > "$HYPR_DIR/theme.name"
+
+# Glass themes derive their palette dynamically from the user's live wallpaper.
+# This never changes the wallpaper; it only reads the configured/current image.
+if [ "$name" = "glass-amber" ]; then
+    wpconf="$CONFIG/waypaper/config.ini"
+    wallpaper=""
+
+    # Always prefer the most current wallpaper source.
+    if [ -f "$wpconf" ]; then
+        wallpaper=$(sed -n 's/^wallpaper *= *//p' "$wpconf" | head -1)
+        wallpaper="${wallpaper/#\~\//$HOME/}"
+        wallpaper="${wallpaper//\~/$HOME}"
+    fi
+
+    # awww can hold wallpaper state that Waypaper has not flushed yet.
+    if [ -z "$wallpaper" ] || [ ! -f "$wallpaper" ]; then
+        if command -v awww >/dev/null 2>&1; then
+            wallpaper=$(awww query 2>/dev/null | sed -n 's/.*: image: //p' | head -1)
+        fi
+    fi
+
+    # Extract from scratch every time; never reuse a stale palette for Glass Amber.
+    rm -f "$src/palette.env" "$CONFIG/hypr/theme.palette.env"
+    if [ -n "$wallpaper" ] && [ -f "$wallpaper" ]; then
+        python3 "$HOME/dotfiles/scripts/theme-colors.py" "$wallpaper" "$src/palette.env" || true
+        cp "$src/palette.env" "$CONFIG/hypr/theme.palette.env" 2>/dev/null || true
+    else
+        notify-send -u normal "Glass Amber" "Wallpaper not found; keeping static fallback"
+    fi
+fi
 
 # Shared palette (new). Falls back to theme.conf for old themes.
 mode="dark"
@@ -48,54 +79,206 @@ fi
 [ "$mode" = "light" ] || mode="dark"
 
 # 1) waybar colours
-cp "$src/theme.css" "$WAYBAR_DIR/theme.css"
+if [ "$name" = "glass-amber" ] && [ -f "$src/palette.env" ]; then
+    . "$src/palette.env"
+    python3 - "$src/palette.env" "$WAYBAR_DIR/theme.css" <<'PY'
+import sys
 
-# 2) wob/OSD colours (osd.sh sources theme.env; wob.ini is updated & reloaded)
-cp "$src/theme.env" "$HYPR_DIR/theme.env"
-wob_ini="$CONFIG/wob/wob.ini"
-if [ -f "$wob_ini" ] && [ -f "$src/theme.env" ]; then
-    (
-        # shellcheck disable=SC1091
-        . "$src/theme.env"
-        sed -i \
-            -e "s/^background_color = .*/background_color = ${WOB_BG:-18181bee}/" \
-            -e "s/^bar_color = .*/bar_color = ${WOB_VOL:-b388ff}/" \
-            -e "s/^border_color = .*/border_color = ${WOB_VOL:-b388ff}/" \
-            "$wob_ini"
-        # Keep the named styles (muted / mic / brightness) in sync too.
-        awk -v bg="${WOB_BG:-18181bee}" -v vol="${WOB_VOL:-b388ff}" \
-            -v mute="${WOB_MUTE:-ff5252}" -v bright="${WOB_BRIGHT:-ffd54f}" '
-            /^\[style\.muted\]/      { style = "muted" }
-            /^\[style\.mic\]/        { style = "mic" }
-            /^\[style\.brightness\]/ { style = "brightness" }
-            /^\[/ && !/^\[style\./   { style = "" }
-            style != "" && /^background_color = / { print "background_color = " bg; next }
-            style == "muted" && /^bar_color = / { print "bar_color = " mute; next }
-            style == "muted" && /^border_color = / { print "border_color = " mute; next }
-            style == "mic" && /^bar_color = / { print "bar_color = " vol; next }
-            style == "mic" && /^border_color = / { print "border_color = " vol; next }
-            style == "brightness" && /^bar_color = / { print "bar_color = " bright; next }
-            style == "brightness" && /^border_color = / { print "border_color = " bright; next }
-            { print }
-        ' "$wob_ini" > "$wob_ini.tmp" && mv "$wob_ini.tmp" "$wob_ini"
-    )
-    pkill -x wob 2>/dev/null || true
+values = {}
+for raw in open(sys.argv[1], encoding="utf-8"):
+    line = raw.strip()
+    if line and not line.startswith("#") and "=" in line:
+        key, value = line.split("=", 1)
+        values[key] = value.strip().strip("\"'")
+
+def rgba(value, alpha):
+    value = value.lstrip("#")
+    rgb = tuple(int(value[i:i+2], 16) for i in (0, 2, 4))
+    return "rgba(%d, %d, %d, %s)" % (*rgb, alpha)
+
+text = """/* Glass Amber — dynamically generated from the live wallpaper */
+@define-color highlight {highlight};
+@define-color dark-9 {dark9};
+@define-color dark-8 {dark8};
+@define-color dark-7 {dark7};
+@define-color dark-6 {dark6};
+@define-color dark-5 {dark5};
+@define-color fg {fg};
+@define-color warn {warn};
+@define-color good {good};
+@define-color on-highlight {on_highlight};
+""".format(
+    highlight=rgba(values["ACCENT"], "1"),
+    dark9=rgba(values["BG"], "0.82"),
+    dark8=rgba(values["BG_ALT"], "0.88"),
+    dark7=rgba(values["BG_HOVER"], "0.92"),
+    dark6=rgba(values["FG_MUTED"], "1"),
+    dark5=rgba(values["FG_MUTED"], "1"),
+    fg=rgba(values["FG"], "1"),
+    warn=rgba(values["WARN"], "1"),
+    good=rgba(values["GOOD"], "1"),
+    on_highlight=rgba(values["BG"], "1"),
+)
+open(sys.argv[2], "w", encoding="utf-8").write(text)
+PY
+else
+    cp "$src/theme.css" "$WAYBAR_DIR/theme.css"
 fi
 
-# 3) wallpaper (optional per theme)
-wp=$(ls "$src"/wallpaper.* 2>/dev/null | head -1)
-if [ -n "$wp" ]; then
-    dest="$WP_DIR/theme-${name}.${wp##*.}"
-    cp -f "$wp" "$dest"
-    awww img "$dest" >/dev/null 2>&1
-    # waypaper restores the last wallpaper at login, so update its line too
-    wpconf="$CONFIG/waypaper/config.ini"
-    [ -f "$wpconf" ] && sed -i "s|^wallpaper = .*|wallpaper = $dest|" "$wpconf"
+# 2) wob/OSD colours (theme.env only; wob.ini remains unchanged)
+if [ "$name" = "glass-amber" ] && [ -f "$src/palette.env" ]; then
+    . "$src/palette.env"
+    cat > "$HYPR_DIR/theme.env" <<EOF
+# Glass Amber — dynamically generated from the live wallpaper
+WOB_BG="${BG}e6"
+WOB_VOL="${ACCENT}"
+WOB_MUTE="${DANGER}"
+WOB_BRIGHT="${WARN}"
+EOF
+else
+    cp "$src/theme.env" "$HYPR_DIR/theme.env"
 fi
+# Wob is intentionally never modified or reloaded by theme selection.
+
+# 3) wallpaper: never change it from theme selection.
+# Themes can optionally provide a wallpaper only for preview/install workflows;
+# applying a theme must leave the user's current wallpaper untouched.
 
 # 4) rofi + wlogout theming (optional per theme)
-[ -f "$src/rofi.rasi" ] && cp "$src/rofi.rasi" "$CONFIG/rofi/theme.rasi"
-[ -f "$src/wlogout.css" ] && cp "$src/wlogout.css" "$CONFIG/wlogout/style.css"
+if [ "$name" = "glass-amber" ] && [ -f "$src/palette.env" ]; then
+    . "$src/palette.env"
+    python3 - "$src/palette.env" "$CONFIG/rofi/theme.rasi" <<'PY'
+import sys
+values = {}
+for raw in open(sys.argv[1], encoding="utf-8"):
+    line = raw.strip()
+    if line and not line.startswith("#") and "=" in line:
+        key, value = line.split("=", 1)
+        values[key] = value.strip().strip("\"'")
+
+def rgb(value):
+    return tuple(int(value[i:i+2], 16) for i in (0, 2, 4))
+def rgba(value, alpha):
+    r, g, b = rgb(value)
+    return "rgba(%d, %d, %d, %s)" % (r, g, b, alpha)
+text = """* {
+    bg: %s;
+    bg-alt: %s;
+    fg: #%s;
+    accent: #%s;
+    border-color: %s;
+}
+
+window {
+    transparency: "real";
+    background-color: @bg;
+    text-color: @fg;
+    border: 2px;
+    border-color: @accent;
+    border-radius: 16px;
+    width: 520px;
+    location: center;
+    anchor: center;
+}
+
+mainbox {
+    background-color: transparent;
+    orientation: vertical;
+    children: [ inputbar, listview ];
+    padding: 16px;
+}
+
+inputbar {
+    background-color: @bg-alt;
+    text-color: @fg;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 0 0 12px 0;
+    children: [ prompt, entry ];
+}
+
+prompt {
+    background-color: transparent;
+    text-color: @accent;
+    padding: 0 8px 0 0;
+}
+
+entry {
+    background-color: transparent;
+    text-color: @fg;
+    placeholder: "Search applications...";
+    placeholder-color: rgba(242, 235, 216, 0.58);
+}
+
+listview {
+    background-color: transparent;
+    columns: 1;
+    lines: 8;
+    cycle: true;
+    dynamic: true;
+    scrollbar: false;
+    spacing: 5px;
+}
+
+element {
+    background-color: transparent;
+    text-color: @fg;
+    border-radius: 9px;
+    padding: 9px 11px;
+}
+
+element selected.normal {
+    background-color: @accent;
+    text-color: #%s;
+}
+
+element-icon {
+    background-color: transparent;
+    size: 22px;
+    margin: 0 10px 0 0;
+}
+
+element-text {
+    background-color: transparent;
+    text-color: inherit;
+    vertical-align: 0.5;
+}
+""" % (rgba(values["BG"], "0.82"), rgba(values["BG_ALT"], "0.72"), values["FG"], values["ACCENT"], rgba(values["ACCENT"], "0.48"), values["BG"])
+open(sys.argv[2], "w", encoding="utf-8").write(text)
+PY
+else
+    [ -f "$src/rofi.rasi" ] && cp "$src/rofi.rasi" "$CONFIG/rofi/theme.rasi"
+fi
+if [ "$name" = "glass-amber" ] && [ -f "$src/palette.env" ]; then
+    python3 - "$src/palette.env" "$CONFIG/wlogout/style.css" <<'PY'
+import sys
+values = {}
+for raw in open(sys.argv[1], encoding="utf-8"):
+    line = raw.strip()
+    if line and not line.startswith("#") and "=" in line:
+        key, value = line.split("=", 1)
+        values[key] = value.strip().strip("\"'")
+def rgb(value):
+    return tuple(int(value[i:i+2], 16) for i in (0, 2, 4))
+def rgba(value, alpha):
+    r,g,b = rgb(value)
+    return "rgba(%d, %d, %d, %s)" % (r,g,b,alpha)
+text = """* { background-image: none; box-shadow: none; }
+window { background-color: %s; }
+button { border-radius: 14px; border-color: %s; text-decoration-color: #%s; color: #%s; background-color: %s; border-style: solid; border-width: 1px; background-repeat: no-repeat; background-position: center; background-size: 25%%; }
+button:focus, button:active, button:hover { background-color: %s; color: #%s; outline-style: none; }
+#lock { background-image: image(url("/usr/share/wlogout/icons/lock.png"), url("/usr/local/share/wlogout/icons/lock.png")); }
+#logout { background-image: image(url("/usr/share/wlogout/icons/logout.png"), url("/usr/local/share/wlogout/icons/logout.png")); }
+#suspend { background-image: image(url("/usr/share/wlogout/icons/suspend.png"), url("/usr/local/share/wlogout/icons/suspend.png")); }
+#hibernate { background-image: image(url("/usr/share/wlogout/icons/hibernate.png"), url("/usr/local/share/wlogout/icons/hibernate.png")); }
+#shutdown { background-image: image(url("/usr/share/wlogout/icons/shutdown.png"), url("/usr/local/share/wlogout/icons/shutdown.png")); }
+#reboot { background-image: image(url("/usr/share/wlogout/icons/reboot.png"), url("/usr/local/share/wlogout/icons/reboot.png")); }
+""" % (rgba(values["BG"], "0.82"), rgba(values["ACCENT"], "0.55"), values["FG"], values["FG"], rgba(values["BG_ALT"], "0.82"), rgba(values["ACCENT"], "0.72"), values["BG"])
+open(sys.argv[2], "w", encoding="utf-8").write(text)
+PY
+else
+    [ -f "$src/wlogout.css" ] && cp "$src/wlogout.css" "$CONFIG/wlogout/style.css"
+fi
 
 # 5) Every other app: swaync, ghostty, GTK3/4, Hyprland borders, KDE/Qt.
 if [ -x "$GEN" ] && [ -f "$src/palette.env" ]; then
@@ -131,9 +314,5 @@ fi
 
 # Hyprland re-reads theme.lua (border colours) without restarting apps.
 hyprctl reload >/dev/null 2>&1 || true
-# Lua config is only re-evaluated on login, so apply the border colours live too.
-if [ -f "$src/palette.env" ]; then
-    hyprctl eval "hl.config({ general = { col = { active_border = { colors = { \"rgba(${ACCENT}ee)\", \"rgba(${ACCENT_ALT}ee)\" }, angle = 45 }, inactive_border = \"rgba(${BG_ALT}aa)\" } } })" >/dev/null 2>&1 || true
-fi
 
 notify-send "Theme" "\"$name\" applied to all apps ($mode) ✓"

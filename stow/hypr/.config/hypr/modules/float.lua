@@ -31,9 +31,10 @@ local function shrink_if_newly_floating(w)
     local tw = math.floor(mon.width / scale * SCREEN_FILL)
     local th = math.floor(mon.height / scale * SCREEN_FILL)
     local sz = w.size
-    -- shrink only if bigger than 60% (never enlarge a small window),
-    -- but always center the floating window on the screen
-    if sz and (sz.x > tw or sz.y > th) then
+    -- Set every resizable floating window to 60% of the monitor.
+    -- Never enlarge a window that intentionally has a fixed/small size.
+    -- (size min/max constraints are honored by Hyprland when resize is dispatched.)
+    if sz then
         hl.dispatch(hl.dsp.window.resize({ x = tw, y = th }))
     end
     hl.dispatch(hl.dsp.window.center())

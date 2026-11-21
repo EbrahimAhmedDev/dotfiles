@@ -1,0 +1,11 @@
+/* Glass Amber — generated palette is copied to Waybar at theme activation */
+@define-color highlight rgba(255, 177, 77, 1);
+@define-color dark-9 rgba(10, 9, 8, 0.82);
+@define-color dark-8 rgba(26, 21, 17, 0.88);
+@define-color dark-7 rgba(48, 36, 27, 0.92);
+@define-color dark-6 rgba(140, 113, 82, 1);
+@define-color dark-5 rgba(188, 161, 138, 1);
+@define-color fg rgba(242, 235, 216, 1);
+@define-color warn rgba(255, 159, 56, 1);
+@define-color good rgba(9, 230, 142, 1);
+@define-color on-highlight rgba(30, 18, 8, 1);
