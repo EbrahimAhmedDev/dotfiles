@@ -27,14 +27,15 @@ KEYLABEL = {
 
 # command → English description (first match wins)
 EXEC_DESCS = [
-    (r"^ghostty$", "Terminal (Ghostty)"),
+    (r"ghostty", "Terminal (Ghostty)"),
     (r"rofi -show drun", "App launcher (rofi)"),
     (r"rofi -show run", "Run a command (rofi)"),
-    (r"control\.sh", "Control menu (themes, OCR, update, power)"),
-    (r"ocr\.sh", "Extract text from screen (OCR)"),
+    (r"control\.sh", "Control menu (themes, OCR/QR, update, power)"),
+    (r"ocr\.sh", "Extract text or QR from screen"),
     (r"keybinds\.sh", "This cheat sheet"),
     (r"clipse", "Clipboard history (clipse)"),
     (r"google-chrome", "Web browser (Chrome)"),
+    (r"firefox", "Web browser (Firefox)"),
     (r"^spotify$", "Music (Spotify)"),
     (r"dolphin", "File manager (Dolphin)"),
     (r"nightlight\.sh", "Night light"),

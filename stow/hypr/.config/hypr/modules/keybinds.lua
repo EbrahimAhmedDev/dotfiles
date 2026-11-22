@@ -13,7 +13,7 @@ hl.bind(secondMod .. " + F", hl.dsp.exec_cmd("dolphin --new-window"))
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("rofi -show drun -show-icons")) -- App launcher
 hl.bind(secondMod .. " + S", hl.dsp.exec_cmd("rofi -show run"))
 hl.bind(thirdMod .. " + S", hl.dsp.exec_cmd(scripts .. "control.sh")) -- قائمة التحكم المركزية
-hl.bind(secondMod .. " + O", hl.dsp.exec_cmd(scripts .. "ocr.sh")) -- OCR: نص من جزء الشاشة
+hl.bind(secondMod .. " + O", hl.dsp.exec_cmd(scripts .. "ocr.sh")) -- OCR/QR: نص أو QR من جزء الشاشة
 
 -- Clipboard history (clipse)
 hl.bind(mainMod .. " + V",

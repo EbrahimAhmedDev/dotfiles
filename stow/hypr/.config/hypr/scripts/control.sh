@@ -13,7 +13,7 @@ choice=$(rofi -dmenu -i -p "Control" <<'EOF'
 🧩  Default Apps
 🌙  Night Light
 📋  Clipboard
-✂️  Extract Text from Screen (OCR)
+✂️  Extract Text / QR from Screen
 🔒  Lock Screen
 ⏻  Power Menu
 ⌨  Keybinds
