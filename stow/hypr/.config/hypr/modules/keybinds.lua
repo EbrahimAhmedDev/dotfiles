@@ -6,10 +6,10 @@ local scripts = "~/.config/hypr/scripts/"
 local osd = scripts .. "osd.sh"
 
 -- Apps
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("ghostty"))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("google-chrome-stable"))
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("pgrep -x ghostty >/dev/null && ghostty +new-window || ghostty"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("firefox --new-window"))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("spotify"))
-hl.bind(secondMod .. " + F", hl.dsp.exec_cmd("dolphin"))
+hl.bind(secondMod .. " + F", hl.dsp.exec_cmd("dolphin --new-window"))
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("rofi -show drun -show-icons")) -- App launcher
 hl.bind(secondMod .. " + S", hl.dsp.exec_cmd("rofi -show run"))
 hl.bind(thirdMod .. " + S", hl.dsp.exec_cmd(scripts .. "control.sh")) -- قائمة التحكم المركزية

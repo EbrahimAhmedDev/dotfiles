@@ -1,0 +1,11 @@
+/* Breeze Dark — KDE Breeze Dark colours */
+@define-color highlight rgba(61, 174, 233, 1);   /* #3daee9 */
+@define-color dark-9 rgba(32, 35, 38, 0.96);     /* #202326 */
+@define-color dark-8 rgba(41, 44, 48, 0.94);     /* #292c30 */
+@define-color dark-7 rgba(42, 81, 103, 0.95);    /* #2a5167 Breeze hover tint */
+@define-color dark-6 rgba(161, 169, 177, 1);     /* #a1a9b1 */
+@define-color dark-5 rgba(161, 169, 177, 1);     /* #a1a9b1 */
+@define-color fg rgba(252, 252, 252, 1);         /* #fcfcfc */
+@define-color warn rgba(246, 116, 0, 1);         /* #f67400 */
+@define-color good rgba(39, 174, 96, 1);         /* #27ae60 */
+@define-color on-highlight rgba(252, 252, 252, 1); /* #fcfcfc */

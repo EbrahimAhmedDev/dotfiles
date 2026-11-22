@@ -85,7 +85,9 @@ def build_colors(p):
     warn = p["WARN"]
     good = p["GOOD"]
     danger = p["DANGER"]
-    on_accent = readable_on(accent)
+    # Optional explicit selection text colour (e.g. Breeze uses white on its
+    # blue accent even though black would be technically more readable).
+    on_accent = p.get("ON_ACCENT", "").lstrip("#") or readable_on(accent)
     border = mix(bg, fg, 0.22)
     return {
         "bg": bg,
