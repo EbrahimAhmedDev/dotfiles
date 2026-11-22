@@ -10,3 +10,7 @@ stow/clipse/.config/clipse/tmp_files/
 
 # Stow noise
 stow/*/.config/**/stack.toml
+
+# Python cache
+__pycache__/
+*.pyc
