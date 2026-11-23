@@ -56,6 +56,29 @@ window#waybar {
   color: black;
 }
 
+#tray {
+  padding: 0 10px;
+  margin: 4px 4px 4px 0;
+  background: alpha(@highlight, 0.16);
+  border: 1px solid @highlight;
+  border-radius: 10px;
+  box-shadow: 0 0 6px alpha(@highlight, 0.25);
+}
+
+#tray:hover {
+  background: alpha(@highlight, 0.28);
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background: alpha(@highlight, 0.35);
+  border-radius: 6px;
+}
+
 #battery.warning {
   color: @warn;
 }

@@ -11,6 +11,7 @@
     ],
     "modules-right": [
         "hyprland/submap",
+        "tray",
         "hyprland/language",
         "group/volume",
         "battery",
@@ -157,6 +158,10 @@
         "on-click": "playerctl play-pause",
         "on-click-middle": "playerctl previous",
         "on-click-right": "playerctl next"
+    },
+    "tray": {
+        "icon-size": 16,
+        "spacing": 8
     },
     "custom/notification": {
         "tooltip": false,
