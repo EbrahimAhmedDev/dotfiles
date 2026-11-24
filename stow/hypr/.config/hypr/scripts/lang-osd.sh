@@ -19,8 +19,8 @@ socat -U - "UNIX-CONNECT:$sock" | while IFS= read -r line; do
         "activelayout>>$kbd,"*)
             layout="${line#*,}"
             case "$layout" in
-                *Arabic*) msg="AR" ;;
-                *English*) msg="EN" ;;
+                *Arabic*) msg="AR 🇪🇬" ;;
+                *English*) msg="EN 🇺🇸" ;;
                 *) msg="$layout" ;;
             esac
             swayosd-client --custom-message "$msg" --custom-icon input-keyboard
