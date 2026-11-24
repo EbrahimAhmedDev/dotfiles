@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Volume / brightness OSD (wob bar) + ThinkPad mute-LED sync.
+# Volume / brightness OSD (SwayOSD) + ThinkPad mute-LED sync.
 # PipeWire doesn't sync the keyboard mute LEDs like PulseAudio did,
 # so we sync them ourselves after every mute toggle (see system/udev/).
 
@@ -8,16 +8,6 @@ LED="/sys/class/leds"
 sync_led() { # sync_led <led> <0|1>
     [ -w "$LED/$1/brightness" ] && echo "$2" > "$LED/$1/brightness"
 }
-
-WOB="$XDG_RUNTIME_DIR/wob.sock"
-
-# Theme colors (written by theme.sh, see ~/dotfiles/themes/)
-_tenv="${XDG_CONFIG_HOME:-$HOME/.config}/hypr/theme.env"
-[ -f "$_tenv" ] && . "$_tenv"
-BG="${WOB_BG:-18181bee}"
-VOL_COLOR="${WOB_VOL:-b388ff}"
-MUTE_COLOR="${WOB_MUTE:-ff5252}"
-BRIGHT_COLOR="${WOB_BRIGHT:-ffd54f}"
 
 # --- click sounds (KDE Ocean theme, played via pw-play) ---
 SND_DIR="/usr/share/sounds/ocean/stereo"
@@ -37,13 +27,14 @@ play_sound() { # play_sound <file.oga> — throttled so key-repeat doesn't spam
     pw-play --volume "$SND_VOLUME" "$1" >/dev/null 2>&1 &
 }
 
+# --- OSD + actual change (SwayOSD) ---
 case "$1" in
-    vol-up)      wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+ ; play_sound "$SND_DIR/audio-volume-change.oga" ;;
-    vol-down)    wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%- ; play_sound "$SND_DIR/audio-volume-change.oga" ;;
-    mute)        wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle ;;
-    mic-mute)    wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle ;;
-    bright-up)   brightnessctl -q set 5%+ ;;
-    bright-down) brightnessctl -q set 5%- ;;
+    vol-up)      swayosd-client --output-volume +5 ; play_sound "$SND_DIR/audio-volume-change.oga" ;;
+    vol-down)    swayosd-client --output-volume -5 ; play_sound "$SND_DIR/audio-volume-change.oga" ;;
+    mute)        swayosd-client --output-volume mute-toggle ;;
+    mic-mute)    swayosd-client --input-volume mute-toggle ;;
+    bright-up)   swayosd-client --brightness +5 ;;
+    bright-down) swayosd-client --brightness -5 ;;
     *) exit 1 ;;
 esac
 
@@ -62,30 +53,5 @@ case "$1" in
         else
             sync_led "platform::micmute" 0
         fi
-        ;;
-esac
-
-[ -p "$WOB" ] || exit 0
-
-case "$1" in
-    vol-*|mute)
-        if wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -q MUTED; then
-            echo "0 muted" > "$WOB"
-        else
-            v=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print int($2 * 100 + 0.5)}')
-            echo "$v" > "$WOB"
-        fi
-        ;;
-    mic-mute)
-        if wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED; then
-            echo "0 muted" > "$WOB"
-        else
-            v=$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | awk '{print int($2 * 100 + 0.5)}')
-            echo "$v mic" > "$WOB"
-        fi
-        ;;
-    bright-*)
-        b=$(( $(brightnessctl get) * 100 / $(brightnessctl max) ))
-        echo "$b brightness" > "$WOB"
         ;;
 esac

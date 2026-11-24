@@ -15,7 +15,6 @@ hl.on("hyprland.start", function()
     -- If the user selected Glass Amber, re-derive it from the wallpaper at login.
     hl.exec_cmd([[sh -c 'sleep 2; theme_name=$(cat "$HOME/.config/hypr/theme.name" 2>/dev/null || true); if [ "$theme_name" = "glass-amber" ]; then "$HOME/.config/hypr/scripts/theme.sh" glass-amber; fi']])
 
-    -- On-screen bar for volume and brightness (wob reads from a fifo)
-    hl.exec_cmd(
-        [[sh -c 'rm -f "$XDG_RUNTIME_DIR/wob.sock"; mkfifo "$XDG_RUNTIME_DIR/wob.sock"; tail -n +1 -F "$XDG_RUNTIME_DIR/wob.sock" | wob']])
+    -- On-screen display for volume, brightness and lock keys (SwayOSD)
+    hl.exec_cmd([[sh -c 'pgrep -x swayosd-server >/dev/null || swayosd-server']])
 end)
