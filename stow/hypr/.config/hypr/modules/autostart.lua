@@ -19,5 +19,5 @@ hl.on("hyprland.start", function()
     hl.exec_cmd([[sh -c 'pgrep -x swayosd-server >/dev/null || swayosd-server']])
 
     -- OSD for keyboard layout changes
-    hl.exec_cmd([[sh -c 'pgrep -f "[l]ang-osd.sh" >/dev/null || "$HOME/.config/hypr/scripts/lang-osd.sh"']])
+    hl.exec_cmd([[sh -c 'pgrep -f "^bash .*[l]ang-osd[.]sh$" >/dev/null || "$HOME/.config/hypr/scripts/lang-osd.sh"']])
 end)
