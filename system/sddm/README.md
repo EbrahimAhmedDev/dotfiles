@@ -2,8 +2,9 @@
 
 The selected login theme is `nier-automata`, configured in
 `sddm.conf.d/20-nier.conf`. The old `silent` theme remains installed as a
-fallback. `/etc/sddm.conf` contains only the virtual-keyboard setting; it no
-longer overrides the selected theme or points at Silent's QML components.
+fallback. `/etc/sddm.conf` disables SDDM's Qt virtual keyboard while keeping
+the physical keyboard available; it no longer overrides the selected theme or
+points at Silent's QML components.
 
 `theme-nier-automata/` is the qylock NieR:Automata theme (upstream GPL-3.0;
 see its `LICENSE` and `NOTICE.md`). It bundles **Zen Kaku Gothic New Medium**
