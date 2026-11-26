@@ -48,7 +48,7 @@ cd ~/dotfiles && ./scripts/install.sh
 
 ### الملفات اللي برة الـ home (استثناء `system/`)
 
-شاشة الـ SDDM (تسجيل الدخول) بتقرا إعداداتها من `/etc/` والثيم من `/usr/share/` — دول برة الـ home فالـ stow مش واصل ليهم. فولدر `system/sddm/` فيه نسخ منهم، و`install.sh` بيرجّعهم بأمر `sudo`.
+شاشة الـ SDDM (تسجيل الدخول) بتقرا إعداداتها من `/etc/` والثيم من `/usr/share/` — دول برة الـ home فالـ stow مش واصل ليهم. فولدر `system/sddm/` فيه نسخ منهم، و`install.sh` بيرجّعهم بأمر `sudo`. تفاصيل ثيم NieR وخطّه وطريقة الرجوع لـSilent في `system/sddm/README.md`.
 
 ---
 
@@ -177,7 +177,7 @@ reboot
 1. بيثبّت `stow`، وبعدين كل حاجة من `packages/official.txt` (و `packages/aur.txt` عن طريق `yay` لو موجود).
 2. لكل باكدج stow: بيمسح الإعدادات الافتراضية المتعارضة في `$HOME` الأول (الـ stow بيرفض يعمل لينك فوق ملف حقيقي)، وبعدين بيعمل stow.
 3. بينسخ `copied/*` جوه `~/.config` (بـ `cp -n`، مش هيستبدل ملفات موجودة).
-4. بيطبّق `system/sddm/*` على `/etc/` و `/usr/share/sddm/themes/silent`، وبشغّل SDDM.
+4. بيطبّق `system/sddm/*` على `/etc/` وثيمات `/usr/share/sddm/themes/` (`silent` و `nier-automata`)، وبشغّل SDDM.
 
 ---
 

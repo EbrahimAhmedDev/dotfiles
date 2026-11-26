@@ -48,7 +48,7 @@ Some programs refuse to follow symlinks, or rewrite the file in place and destro
 
 ### Files outside your home (the `system/` exception)
 
-SDDM (the login screen) reads its config from `/etc/` and its theme from `/usr/share/` — outside your home, so stow can't reach those. `system/sddm/` holds copies of them, and `install.sh` puts them back with `sudo`.
+SDDM (the login screen) reads its config from `/etc/` and its theme from `/usr/share/` — outside your home, so stow can't reach those. `system/sddm/` holds copies of them, and `install.sh` puts them back with `sudo`. NieR theme/font details and the Silent rollback steps are in `system/sddm/README.md`.
 
 ---
 
@@ -177,7 +177,7 @@ What `install.sh` does internally:
 1. Installs `stow`, then everything from `packages/official.txt` (and `packages/aur.txt` via `yay` if present).
 2. For each stow package, deletes conflicting default configs in `$HOME` first (stow refuses to link over real files), then stows it.
 3. Copies `copied/*` into `~/.config` (with `cp -n`, won't overwrite).
-4. Applies `system/sddm/*` to `/etc/` and `/usr/share/sddm/themes/silent`, enables SDDM.
+4. Applies `system/sddm/*` to `/etc/` and to the themes under `/usr/share/sddm/themes/` (`silent` and `nier-automata`), enables SDDM.
 
 ---
 

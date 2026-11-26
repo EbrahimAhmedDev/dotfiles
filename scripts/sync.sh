@@ -17,6 +17,7 @@ mkdir -p "$dot/system/sddm"
 [ -d /etc/sddm.conf.d ] && sudo cp -r /etc/sddm.conf.d "$dot/system/sddm/"
 [ -f /etc/sddm.conf ] && sudo cp /etc/sddm.conf "$dot/system/sddm/"
 [ -d /usr/share/sddm/themes/silent ] && sudo cp -r /usr/share/sddm/themes/silent "$dot/system/sddm/theme-silent"
+[ -d /usr/share/sddm/themes/nier-automata ] && sudo cp -r /usr/share/sddm/themes/nier-automata "$dot/system/sddm/theme-nier-automata"
 sudo chown -R "$(id -un):$(id -gn)" "$dot/system"
 
 echo "sync done"
