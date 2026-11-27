@@ -9,10 +9,15 @@ Writes (inside config-dir, default ~/.config):
   gtk-3.0/colors.css        Breeze GTK colour variables (GTK3 apps)
   gtk-4.0/colors.css        Breeze GTK colour variables (GTK4 apps)
   hypr/theme.lua            Hyprland border colours (loaded by appearance.lua)
-  kdeglobals                KDE/Qt colour scheme (Dolphin, Qt apps, ...)
+  kdeglobals                KDE color scheme for Dolphin and other KDE apps
+  qt6ct/colors/current.conf  Qt palette for other Qt apps, regenerated per theme
+  clipse/custom_theme.json  Clipse clipboard picker colors
+  starship.toml             Prompt palette, preserving existing modules
+  mako/config               Optional Mako notification colors
 """
 
 import hashlib
+import json
 import os
 import sys
 
@@ -302,6 +307,45 @@ def generate_kdeglobals(c, p, config):
         "[Colors:Complementary]": complementary,
     }
 
+    # KDE apps such as Dolphin use KColorScheme, not qt6ct's QPalette.
+    # Install/update a real .colors file and select it through kdeglobals.
+    scheme_name = "DotfilesGenerated"
+    scheme_lines = [
+        "[ColorEffects:Disabled]",
+        "ChangeSelectionColor=",
+        "Color=56,56,56",
+        "ColorAmount=0",
+        "ColorEffect=0",
+        "ContrastAmount=0.65",
+        "ContrastEffect=1",
+        "IntensityAmount=0.1",
+        "IntensityEffect=2",
+        "",
+        "[ColorEffects:Inactive]",
+        "ChangeSelectionColor=true",
+        "Color=112,111,110",
+        "ColorAmount=0.025",
+        "ColorEffect=2",
+        "ContrastAmount=0.1",
+        "ContrastEffect=2",
+        "Enable=false",
+        "IntensityAmount=0",
+        "IntensityEffect=0",
+        "",
+    ]
+    for name, colors in sections.items():
+        scheme_lines.append(name)
+        scheme_lines.extend("%s=%s" % item for item in colors.items())
+        scheme_lines.append("")
+    scheme_lines.extend(("[General]", "ColorScheme=" + scheme_name,
+                         "Name=Dotfiles Generated"))
+    scheme_text = "\n".join(scheme_lines) + "\n"
+    data_home = os.environ.get(
+        "XDG_DATA_HOME", os.path.join(os.path.dirname(config), ".local", "share"))
+    scheme_path = os.path.join(data_home, "color-schemes", scheme_name + ".colors")
+    write(scheme_path, scheme_text)
+    digest = hashlib.sha1(scheme_text.encode("utf-8")).hexdigest()
+
     section = None
     output = []
     for line in lines:
@@ -327,8 +371,9 @@ def generate_kdeglobals(c, p, config):
         elif line.startswith("inactiveForeground="):
             output.append("inactiveForeground=" + kde_rgb(c["muted"]))
         elif line.startswith("ColorSchemeHash="):
-            digest = hashlib.md5(("".join("%s=%s" % item for item in sorted(p.items()))).encode()).hexdigest()
             output.append("ColorSchemeHash=" + digest)
+        elif line.startswith("ColorScheme="):
+            output.append("ColorScheme=" + scheme_name)
         elif line.startswith("LookAndFeelPackage="):
             mode = p.get("MODE", "dark").lower()
             output.append("LookAndFeelPackage=org.kde.%s.desktop" %
@@ -336,16 +381,207 @@ def generate_kdeglobals(c, p, config):
         else:
             output.append(line)
 
+    output = update_ini_group(output, "General", {
+        "ColorScheme": scheme_name,
+        "ColorSchemeHash": digest,
+    })
+    output = update_ini_group(output, "UiSettings", {
+        "ColorScheme": scheme_name,
+    })
     write(path, "\n".join(output) + "\n")
+
+
+def update_ini_group(lines, group, values):
+    header = "[%s]" % group
+    output = []
+    in_group = False
+    found_group = False
+    written = set()
+
+    def append_missing():
+        for key, value in values.items():
+            if key not in written:
+                output.append("%s=%s" % (key, value))
+                written.add(key)
+
+    for line in lines:
+        if line.startswith("[") and line.endswith("]"):
+            if in_group:
+                append_missing()
+                in_group = False
+            output.append(line)
+            if line == header and not found_group:
+                in_group = True
+                found_group = True
+            continue
+        if in_group and "=" in line:
+            key = line.split("=", 1)[0].strip()
+            if key in values:
+                if key not in written:
+                    output.append("%s=%s" % (key, values[key]))
+                    written.add(key)
+                continue
+        output.append(line)
+    if in_group:
+        append_missing()
+    if not found_group:
+        if output and output[-1] != "":
+            output.append("")
+        output.append(header)
+        for key, value in values.items():
+            output.append("%s=%s" % (key, value))
+    return output
+
+
+def generate_qt6ct(c, p, config):
+    """Write a Qt6ct palette so Qt apps follow each generated desktop theme."""
+    def qcolor(value, alpha=255):
+        r, g, b = rgb(value)
+        return "#%02x%02x%02x%02x" % (alpha, r, g, b)
+
+    bg = c["bg"]
+    bg_alt = c["bg_alt"]
+    fg = c["fg"]
+    muted = c["muted"]
+    accent = c["accent"]
+    border = c["border"]
+    light = mix(bg_alt, fg, 0.22)
+    midlight = mix(bg_alt, fg, 0.10)
+    dark = mix(bg_alt, bg, 0.45)
+    shadow = qcolor(mix(bg, "#000000", 0.4), 128)
+    transparent = "#00000000"
+
+    # Qt 6.12 QPalette roles, in enum order; qt6ct derives the Accent role
+    # from Highlight for compatibility with the 21-value on-disk format.
+    active = [
+        qcolor(fg), qcolor(bg_alt), qcolor(light), qcolor(midlight),
+        qcolor(dark), qcolor(border), qcolor(fg), qcolor(fg), qcolor(fg),
+        qcolor(bg), qcolor(bg_alt), shadow, qcolor(accent),
+        qcolor(c["on_accent"]), qcolor(accent), qcolor(c["accent_alt"]),
+        qcolor(bg_alt), transparent, qcolor(bg_alt), qcolor(fg), qcolor(muted),
+    ]
+    inactive = active.copy()
+    disabled = active.copy()
+    for role in (0, 6, 7, 8, 13, 14, 15, 19, 20):
+        disabled[role] = qcolor(muted)
+    disabled[12] = qcolor(border)
+
+    palette_path = os.path.join(config, "qt6ct", "colors", "current.conf")
+    palette = "[ColorScheme]\n"
+    palette += "active_colors=%s\n" % ", ".join(active)
+    palette += "inactive_colors=%s\n" % ", ".join(inactive)
+    palette += "disabled_colors=%s\n" % ", ".join(disabled)
+    write(palette_path, palette)
+
+    settings_path = os.path.join(config, "qt6ct", "qt6ct.conf")
+    if os.path.exists(settings_path):
+        with open(settings_path, encoding="utf-8") as fh:
+            settings = fh.read().splitlines()
+    else:
+        settings = []
+    icon_theme = "breeze" if p.get("MODE", "dark").lower() == "light" else "breeze-dark"
+    settings = update_ini_group(settings, "Appearance", {
+        "color_scheme_path": palette_path,
+        "custom_palette": "true",
+        "icon_theme": icon_theme,
+        "style": "Breeze",
+    })
+    write(settings_path, "\n".join(settings) + "\n")
+
+
+def generate_starship(c, config):
+    """Update Starship's named palette while preserving the user's modules."""
+    path = os.path.join(config, "starship.toml")
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as fh:
+        lines = fh.read().splitlines()
+    palette = {
+        "accent": '"#' + c["accent"] + '"',
+        "accent_alt": '"#' + c["accent_alt"] + '"',
+        "bg": '"#' + c["bg"] + '"',
+        "bg_alt": '"#' + c["bg_alt"] + '"',
+        "bg_hover": '"#' + c["bg_hover"] + '"',
+        "fg": '"#' + c["fg"] + '"',
+        "muted": '"#' + c["muted"] + '"',
+        "on_accent": '"#' + c["on_accent"] + '"',
+        "good": '"#' + c["good"] + '"',
+        "warn": '"#' + c["warn"] + '"',
+        "danger": '"#' + c["danger"] + '"',
+    }
+    lines = update_ini_group(lines, "palettes.dotfiles", palette)
+    write(path, "\n".join(lines) + "\n")
+
+
+def generate_mako(c, config):
+    """Update the optional Mako config if it exists in this setup."""
+    path = os.path.join(config, "mako", "config")
+    if not os.path.exists(path):
+        return
+    with open(path, encoding="utf-8") as fh:
+        lines = fh.read().splitlines()
+    section = ""
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.startswith("[") and stripped.endswith("]"):
+            section = stripped
+        if stripped.startswith("background-color="):
+            lines[index] = "background-color=#%se6" % c["bg"]
+        elif stripped.startswith("text-color="):
+            lines[index] = "text-color=#%s" % c["fg"]
+        elif stripped.startswith("border-color="):
+            border = c["accent"]
+            if section == "[urgency=low]":
+                border = c["muted"]
+            elif section == "[urgency=high]":
+                border = c["danger"]
+            lines[index] = "border-color=#%s" % border
+        elif stripped.startswith("progress-color=over "):
+            lines[index] = "progress-color=over #%saa" % c["accent"]
+    write(path, "\n".join(lines) + "\n")
+
+
+def generate_clipse(c, config):
+    """Enable Clipse's custom theme and make it track the selected palette."""
+    theme = {
+        "useCustom": True,
+        "TitleFore": "#" + c["on_accent"],
+        "TitleBack": "#" + c["accent"],
+        "TitleInfo": "#" + c["accent_alt"],
+        "NormalTitle": "#" + c["fg"],
+        "DimmedTitle": "#" + c["muted"],
+        "SelectedTitle": "#" + c["on_accent"],
+        "NormalDesc": "#" + c["muted"],
+        "DimmedDesc": "#" + c["muted"],
+        "SelectedDesc": "#" + c["on_accent"],
+        "StatusMsg": "#" + c["good"],
+        "PinIndicatorColor": "#" + c["warn"],
+        "SelectedBorder": "#" + c["accent"],
+        "SelectedDescBorder": "#" + c["accent_alt"],
+        "FilteredMatch": "#" + c["accent"],
+        "FilterPrompt": "#" + c["accent_alt"],
+        "FilterInfo": "#" + c["muted"],
+        "FilterText": "#" + c["fg"],
+        "FilterCursor": "#" + c["accent"],
+        "HelpKey": "#" + c["accent"],
+        "HelpDesc": "#" + c["muted"],
+        "PageActiveDot": "#" + c["accent"],
+        "PageInactiveDot": "#" + c["muted"],
+        "DividerDot": "#" + c["bg_hover"],
+        "PreviewedText": "#" + c["fg"],
+        "PreviewBorder": "#" + c["accent"],
+    }
+    write(os.path.join(config, "clipse", "custom_theme.json"),
+          json.dumps(theme, indent=4) + "\n")
 
 
 def main():
     if len(sys.argv) < 2:
-        print("usage: theme-generate.py <theme-dir> [config-dir]", file=sys.stderr)
+        print("usage: theme-generate.py <theme-dir> [config-dir] [palette-file]", file=sys.stderr)
         return 2
     theme_dir = os.path.abspath(sys.argv[1])
     config = os.path.abspath(sys.argv[2]) if len(sys.argv) > 2 else os.path.expanduser("~/.config")
-    palette_path = os.path.join(theme_dir, "palette.env")
+    palette_path = os.path.abspath(sys.argv[3]) if len(sys.argv) > 3 else os.path.join(theme_dir, "palette.env")
     if not os.path.exists(palette_path):
         print("missing palette.env in " + theme_dir, file=sys.stderr)
         return 1
@@ -362,6 +598,10 @@ def main():
     generate_gtk(c, config)
     generate_hypr(c, config)
     generate_kdeglobals(c, p, config)
+    generate_qt6ct(c, p, config)
+    generate_starship(c, config)
+    generate_clipse(c, config)
+    generate_mako(c, config)
     print("theme files generated for " + os.path.basename(theme_dir))
     return 0
 

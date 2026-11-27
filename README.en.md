@@ -14,7 +14,7 @@ Everything is designed around one idea: **your real config files live in this re
 |---|---|
 | Installed a new program / added new configs | `dotsync` |
 | Edited a file that already exists in the repo | `dotgit` |
-| Changed something **outside your home** (e.g. SDDM theme) | `sync.sh` then `dotgit` |
+| Changed something **outside your home** (e.g. SDDM settings) | `sync.sh` then `dotgit` |
 | Fresh new machine | `git clone` + `./scripts/install.sh` (see [New machine setup](#new-machine-setup)) |
 
 ```sh
@@ -48,7 +48,7 @@ Some programs refuse to follow symlinks, or rewrite the file in place and destro
 
 ### Files outside your home (the `system/` exception)
 
-SDDM (the login screen) reads its config from `/etc/` and its theme from `/usr/share/` — outside your home, so stow can't reach those. `system/sddm/` holds copies of them, and `install.sh` puts them back with `sudo`. NieR theme/font details and the Silent rollback steps are in `system/sddm/README.md`.
+The login screen uses **SDDM**. Its config lives in `/etc/sddm.conf` and `/etc/sddm.conf.d/`; the repo keeps a copy in `system/sddm/`, and `install.sh` applies it with `sudo`. Maldives is the selected stock theme, and no third-party themes are installed.
 
 ---
 
@@ -65,7 +65,7 @@ dotfiles/
 │   ├── official.txt #   every pacman repo package (one name per line)
 │   └── aur.txt      #   every AUR package
 ├── copied/          # configs that must be COPIED, not linked
-├── system/          # system-level files (SDDM config + theme)
+├── system/          # system-level files (SDDM config)
 ├── scripts/         # all the automation, see below
 └── README.md
 ```
@@ -131,7 +131,7 @@ Check that a change was actually saved with `git status --short` inside `~/dotfi
 
 ## System-level changes (outside your home) — no surprises ⚠️
 
-Any change you make to **system files outside your home** — like switching the SDDM theme or editing login-screen settings — **is invisible to the automatic scripts**:
+Any change you make to **system files outside your home** — like editing the SDDM login settings — **is invisible to the automatic scripts**:
 
 - `dotsync` only covers `~/.config` and the package lists — **it never touches `system/`**
 - So the repo stays stuck on the old version, and if you reformat, `install.sh` will restore you **with the old setup**
@@ -177,7 +177,7 @@ What `install.sh` does internally:
 1. Installs `stow`, then everything from `packages/official.txt` (and `packages/aur.txt` via `yay` if present).
 2. For each stow package, deletes conflicting default configs in `$HOME` first (stow refuses to link over real files), then stows it.
 3. Copies `copied/*` into `~/.config` (with `cp -n`, won't overwrite).
-4. Applies `system/sddm/*` to `/etc/` and to the themes under `/usr/share/sddm/themes/` (`silent` and `nier-automata`), enables SDDM.
+4. Applies `system/sddm/` configuration to `/etc/` and enables SDDM.
 
 ---
 

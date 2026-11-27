@@ -2,21 +2,22 @@
 
 add_newline = true
 command_timeout = 1000
+palette = "dotfiles"
 
 
 
 
 format = """
-[\ue0b6](fg:#3466c2)\
+[\ue0b6](fg:accent)\
 $username\
-[\ue0b0](fg:#3466c2 bg:#2b4170)\
+[\ue0b0](fg:accent bg:bg_alt)\
 $directory\
 $git_branch\
 $git_status\
 ${custom.git_end}\
 ${custom.nogit_end}\
 $time\
-[\ue0b4](fg:#24493f) \
+[\ue0b4](fg:bg_hover) \
 $python\
 $nodejs\
 $rust\
@@ -52,14 +53,14 @@ $character"""
 
 [username]
 show_always = true
-style_user = "bold fg:#ffffff bg:#3466c2"
-style_root = "bold fg:#ffffff bg:#e01b24"
+style_user = "bold fg:on_accent bg:accent"
+style_root = "bold fg:on_accent bg:danger"
 format = "[ \uf303 $user ]($style)"
 
 [directory]
-style = "fg:#e8e8e8 bg:#2b4170"
+style = "fg:fg bg:bg_alt"
 read_only = " \uf023"
-read_only_style = "fg:#ff6b6b bg:#2b4170"
+read_only_style = "fg:danger bg:bg_alt"
 home_symbol = "\uf015 ~"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -67,11 +68,11 @@ format = "[ $path]($style)[$read_only]($read_only_style)[ ]($style)"
 
 [git_branch]
 symbol = "\ue0a0 "
-style = "fg:#d2a8ff bg:#52407f"
-format = "[\ue0b0](fg:#2b4170 bg:#52407f)[ $symbol$branch ]($style)"
+style = "fg:accent_alt bg:bg_hover"
+format = "[\ue0b0](fg:bg_alt bg:bg_hover)[ $symbol$branch ]($style)"
 
 [git_status]
-style = "fg:#d2a8ff bg:#52407f"
+style = "fg:accent_alt bg:bg_hover"
 format = "([$all_status$ahead_behind ]($style))"
 conflicted = "="
 ahead = "⇡"
@@ -94,178 +95,178 @@ disabled = true
 [custom.git_end]
 when = "git rev-parse --is-inside-work-tree"
 command = "echo 1"
-format = "[\ue0b0](fg:#52407f bg:#24493f)"
+format = "[\ue0b0](fg:bg_hover bg:bg_hover)"
 shell = ["sh"]
 
 [custom.nogit_end]
 when = "! git rev-parse --is-inside-work-tree"
 command = "echo 1"
-format = "[\ue0b0](fg:#2b4170 bg:#24493f)"
+format = "[\ue0b0](fg:bg_alt bg:bg_hover)"
 shell = ["sh"]
 
 [time]
 disabled = false
 time_format = "%H:%M"
-style = "fg:#7ee787 bg:#24493f"
+style = "fg:good bg:bg_hover"
 format = "[ \uf017 $time ]($style)"
 
 
 [python]
 symbol = "\ue73c "
-style = "fg:#ffd43b"
+style = "fg:warn"
 format = '[$symbol($version )(\($virtualenv\) )]($style)'
 
 [nodejs]
 symbol = "\ue718 "
-style = "fg:#83cd29"
+style = "fg:good"
 format = "[$symbol($version )]($style)"
 
 [rust]
 symbol = "\ue7a8 "
-style = "fg:#ff7b63"
+style = "fg:danger"
 format = "[$symbol($version )]($style)"
 
 [golang]
 symbol = "\ue626 "
-style = "fg:#00add8"
+style = "fg:accent"
 format = "[$symbol($version )]($style)"
 
 [java]
 symbol = "\ue256 "
-style = "fg:#f89820"
+style = "fg:warn"
 format = "[$symbol($version )]($style)"
 
 [kotlin]
 symbol = "\ue634 "
-style = "fg:#a97bff"
+style = "fg:accent_alt"
 format = "[$symbol($version )]($style)"
 
 [php]
 symbol = "\ue608 "
-style = "fg:#8892bf"
+style = "fg:muted"
 format = "[$symbol($version )]($style)"
 
 [c]
 symbol = "\ue61e "
-style = "fg:#5c8dbc"
+style = "fg:accent"
 format = "[$symbol($version(-$name) )]($style)"
 
 [cpp]
 disabled = false
 symbol = "\ue61d "
-style = "fg:#659ad2"
+style = "fg:accent"
 format = "[$symbol($version(-$name) )]($style)"
 
 [dotnet]
 symbol = "\ue77f "
-style = "fg:#9b6bff"
+style = "fg:accent_alt"
 format = "[$symbol($version )]($style)"
 
 [ruby]
 symbol = "\ue791 "
-style = "fg:#e0463a"
+style = "fg:danger"
 format = "[$symbol($version )]($style)"
 
 [swift]
 symbol = "\ue755 "
-style = "fg:#fa7343"
+style = "fg:warn"
 format = "[$symbol($version )]($style)"
 
 [dart]
 symbol = "\ue798 "
-style = "fg:#00b4ab"
+style = "fg:good"
 format = "[$symbol($version )]($style)"
 
 [lua]
 symbol = "\ue620 "
-style = "fg:#51a0cf"
+style = "fg:accent"
 format = "[$symbol($version )]($style)"
 
 [perl]
 symbol = "\ue769 "
-style = "fg:#6c7bd1"
+style = "fg:accent_alt"
 format = "[$symbol($version )]($style)"
 
 [scala]
 symbol = "\ue737 "
-style = "fg:#dc322f"
+style = "fg:danger"
 format = "[$symbol($version )]($style)"
 
 [elixir]
 symbol = "\ue62d "
-style = "fg:#a074c4"
+style = "fg:accent_alt"
 format = "[$symbol($version )]($style)"
 
 [haskell]
 symbol = "\ue777 "
-style = "fg:#8f7bd1"
+style = "fg:accent_alt"
 format = "[$symbol($version )]($style)"
 
 [zig]
 symbol = "\ue6a9 "
-style = "fg:#f7a41d"
+style = "fg:warn"
 format = "[$symbol($version )]($style)"
 
 [julia]
 symbol = "\ue624 "
-style = "fg:#9558b2"
+style = "fg:accent_alt"
 format = "[$symbol($version )]($style)"
 
 [crystal]
 symbol = "\ue62f "
-style = "fg:#e6e6e6"
+style = "fg:fg"
 format = "[$symbol($version )]($style)"
 
 [elm]
 symbol = "\ue62c "
-style = "fg:#60b5cc"
+style = "fg:accent"
 format = "[$symbol($version )]($style)"
 
 [erlang]
 symbol = "\ue7b1 "
-style = "fg:#e0577a"
+style = "fg:danger"
 format = "[$symbol($version )]($style)"
 
 [terraform]
 symbol = "\uf1bb "
-style = "fg:#a78bfa"
+style = "fg:accent_alt"
 format = "[$symbol$workspace ]($style)"
 
 
 [nix_shell]
 symbol = "\uf313 "
-style = "fg:#7ebae4"
+style = "fg:accent"
 format = "[$symbol$state ]($style)"
 
 [docker_context]
 symbol = "\uf308 "
-style = "fg:#4fa6ff"
+style = "fg:accent"
 format = "[$symbol$context ]($style)"
 
 [kubernetes]
 disabled = false
 symbol = "☸ "
-style = "fg:#326ce5"
+style = "fg:accent"
 format = '[$symbol$context( \($namespace\)) ]($style)'
 
 [aws]
 symbol = "\ue7ad "
-style = "fg:#ff9900"
+style = "fg:warn"
 format = '[$symbol($profile )(\($region\) )]($style)'
 
 [package]
 symbol = "\uf487 "
-style = "fg:#f5a25d"
+style = "fg:warn"
 format = "[$symbol$version ]($style)"
 
 [cmd_duration]
 min_time = 2000
-style = "fg:#f5c211"
+style = "fg:warn"
 format = "[\uf252 $duration ]($style)"
 
 [jobs]
 symbol = "\uf013 "
-style = "fg:#4fa6ff"
+style = "fg:accent"
 number_threshold = 1
 format = "[$symbol$number ]($style)"
 
@@ -273,3 +274,16 @@ format = "[$symbol$number ]($style)"
 success_symbol = "[➜](bold green)"
 error_symbol = "[➜](bold red)"
 vimcmd_symbol = "[➜](bold yellow)"
+
+[palettes.dotfiles]
+accent = "#75f1fa"
+accent_alt = "#c792ea"
+bg = "#18181b"
+bg_alt = "#27272a"
+bg_hover = "#3f3f46"
+fg = "#ffffff"
+muted = "#a1a1aa"
+on_accent = "#000000"
+good = "#42ff9f"
+warn = "#f1c40f"
+danger = "#e35149"

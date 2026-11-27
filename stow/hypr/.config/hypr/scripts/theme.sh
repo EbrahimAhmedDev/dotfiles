@@ -37,41 +37,39 @@ fi
 src="$THEMES_DIR/$name"
 printf '%s\n' "$name" > "$HYPR_DIR/theme.name"
 
-# Glass themes derive their palette dynamically from the user's live wallpaper.
-# This never changes the wallpaper; it only reads the configured/current image.
+# A Glass Amber palette may be derived from the current wallpaper. Only read
+# wallpaper state; write generated colors under ~/.config, never into themes/.
+ACTIVE_PALETTE="$src/palette.env"
 if [ "$name" = "glass-amber" ]; then
     wpconf="$CONFIG/waypaper/config.ini"
     wallpaper=""
-
-    # Always prefer the most current wallpaper source.
     if [ -f "$wpconf" ]; then
         wallpaper=$(sed -n 's/^wallpaper *= *//p' "$wpconf" | head -1)
         wallpaper="${wallpaper/#\~\//$HOME/}"
         wallpaper="${wallpaper//\~/$HOME}"
     fi
-
-    # awww can hold wallpaper state that Waypaper has not flushed yet.
     if [ -z "$wallpaper" ] || [ ! -f "$wallpaper" ]; then
         if command -v awww >/dev/null 2>&1; then
             wallpaper=$(awww query 2>/dev/null | sed -n 's/.*: image: //p' | head -1)
         fi
     fi
-
-    # Extract from scratch every time; never reuse a stale palette for Glass Amber.
-    rm -f "$src/palette.env" "$CONFIG/hypr/theme.palette.env"
     if [ -n "$wallpaper" ] && [ -f "$wallpaper" ]; then
-        python3 "$HOME/dotfiles/scripts/theme-colors.py" "$wallpaper" "$src/palette.env" || true
-        cp "$src/palette.env" "$CONFIG/hypr/theme.palette.env" 2>/dev/null || true
+        generated_palette="$HYPR_DIR/theme.palette.env"
+        if python3 "$HOME/dotfiles/scripts/theme-colors.py" "$wallpaper" "$generated_palette"; then
+            ACTIVE_PALETTE="$generated_palette"
+        else
+            notify-send -u critical "Glass Amber" "Could not derive colors; using its static palette"
+        fi
     else
-        notify-send -u normal "Glass Amber" "Wallpaper not found; keeping static fallback"
+        notify-send -u normal "Glass Amber" "Wallpaper not found; using its static palette"
     fi
 fi
 
 # Shared palette (new). Falls back to theme.conf for old themes.
 mode="dark"
-if [ -f "$src/palette.env" ]; then
+if [ -f "$ACTIVE_PALETTE" ]; then
     # shellcheck disable=SC1091
-    . "$src/palette.env"
+    . "$ACTIVE_PALETTE"
     mode="${MODE:-dark}"
 elif [ -f "$src/theme.conf" ]; then
     mode=$(grep '^mode=' "$src/theme.conf" | cut -d= -f2 | tr -d '[:space:]')
@@ -79,9 +77,9 @@ fi
 [ "$mode" = "light" ] || mode="dark"
 
 # 1) waybar colours
-if [ "$name" = "glass-amber" ] && [ -f "$src/palette.env" ]; then
-    . "$src/palette.env"
-    python3 - "$src/palette.env" "$WAYBAR_DIR/theme.css" <<'PY'
+if [ "$name" = "glass-amber" ] && [ -f "$ACTIVE_PALETTE" ]; then
+    . "$ACTIVE_PALETTE"
+    python3 - "$ACTIVE_PALETTE" "$WAYBAR_DIR/theme.css" <<'PY'
 import sys
 
 values = {}
@@ -126,8 +124,8 @@ else
 fi
 
 # 2) wob/OSD colours (theme.env only; wob.ini remains unchanged)
-if [ "$name" = "glass-amber" ] && [ -f "$src/palette.env" ]; then
-    . "$src/palette.env"
+if [ "$name" = "glass-amber" ] && [ -f "$ACTIVE_PALETTE" ]; then
+    . "$ACTIVE_PALETTE"
     cat > "$HYPR_DIR/theme.env" <<EOF
 # Glass Amber — dynamically generated from the live wallpaper
 WOB_BG="${BG}e6"
@@ -145,9 +143,9 @@ fi
 # applying a theme must leave the user's current wallpaper untouched.
 
 # 4) rofi + wlogout theming (optional per theme)
-if [ "$name" = "glass-amber" ] && [ -f "$src/palette.env" ]; then
-    . "$src/palette.env"
-    python3 - "$src/palette.env" "$CONFIG/rofi/theme.rasi" <<'PY'
+if [ "$name" = "glass-amber" ] && [ -f "$ACTIVE_PALETTE" ]; then
+    . "$ACTIVE_PALETTE"
+    python3 - "$ACTIVE_PALETTE" "$CONFIG/rofi/theme.rasi" <<'PY'
 import sys
 values = {}
 for raw in open(sys.argv[1], encoding="utf-8"):
@@ -249,8 +247,8 @@ PY
 else
     [ -f "$src/rofi.rasi" ] && cp "$src/rofi.rasi" "$CONFIG/rofi/theme.rasi"
 fi
-if [ "$name" = "glass-amber" ] && [ -f "$src/palette.env" ]; then
-    python3 - "$src/palette.env" "$CONFIG/wlogout/style.css" <<'PY'
+if [ "$name" = "glass-amber" ] && [ -f "$ACTIVE_PALETTE" ]; then
+    python3 - "$ACTIVE_PALETTE" "$CONFIG/wlogout/style.css" <<'PY'
 import sys
 values = {}
 for raw in open(sys.argv[1], encoding="utf-8"):
@@ -280,25 +278,48 @@ else
     [ -f "$src/wlogout.css" ] && cp "$src/wlogout.css" "$CONFIG/wlogout/style.css"
 fi
 
-# 5) Every other app: swaync, ghostty, GTK3/4, Hyprland borders, KDE/Qt.
-if [ -x "$GEN" ] && [ -f "$src/palette.env" ]; then
-    python3 "$GEN" "$src" "$CONFIG" || true
+# 5) Generate shared palettes for swaync, Ghostty, GTK3/4, Hyprland, KDE,
+# Qt6ct, Clipse and Starship. Fail visibly rather than claiming success.
+if [ -x "$GEN" ] && [ -f "$ACTIVE_PALETTE" ]; then
+    if ! python3 "$GEN" "$src" "$CONFIG" "$ACTIVE_PALETTE"; then
+        notify-send -u critical "Theme" "Could not generate all app palettes"
+        exit 1
+    fi
 fi
 
-# 6) GTK light/dark (Breeze variant + GTK colour variables from step 5)
-if command -v xsettingsd >/dev/null 2>&1 && [ -f "$XSET_CONF" ]; then
-    if [ "$mode" = "light" ]; then
-        xset_name="Breeze";       pref="false"; scheme="default"
+# 6) GTK light/dark + icon theme. settings.ini serves GTK Wayland apps;
+# XSettings serves XWayland apps and xsettingsd must actually be running.
+if [ "$mode" = "light" ]; then
+    xset_name="Breeze";       pref="false"; scheme="default"; icon_theme="breeze"
+else
+    xset_name="Breeze-Dark";  pref="true";  scheme="prefer-dark"; icon_theme="breeze-dark"
+fi
+for settings in "$GTK3_INI" "$GTK4_INI"; do
+    [ -f "$settings" ] || continue
+    sed -i \
+        -e "s/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=$pref/" \
+        -e "s/^gtk-icon-theme-name=.*/gtk-icon-theme-name=$icon_theme/" \
+        "$settings"
+done
+if [ -f "$XSET_CONF" ]; then
+    if grep -q '^Net/ThemeName ' "$XSET_CONF"; then
+        sed -i "s/^Net\/ThemeName .*/Net\/ThemeName \"$xset_name\"/" "$XSET_CONF"
     else
-        xset_name="Breeze-Dark";  pref="true";  scheme="prefer-dark"
+        printf 'Net/ThemeName "%s"\n' "$xset_name" >> "$XSET_CONF"
     fi
-    sed -i "s/^gtk-application-prefer-dark-theme=.*/gtk-application-prefer-dark-theme=$pref/" \
-        "$GTK3_INI" "$GTK4_INI" 2>/dev/null
-    sed -i "s/^Net\/ThemeName .*/Net\/ThemeName \"$xset_name\"/" "$XSET_CONF"
-    gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null || true
-    # restart xsettingsd only if it was already running (it isn't on this setup)
-    if pgrep -x xsettingsd >/dev/null 2>&1; then
-        pkill -x xsettingsd
+    if grep -q '^Net/IconThemeName ' "$XSET_CONF"; then
+        sed -i "s/^Net\/IconThemeName .*/Net\/IconThemeName \"$icon_theme\"/" "$XSET_CONF"
+    else
+        printf 'Net/IconThemeName "%s"\n' "$icon_theme" >> "$XSET_CONF"
+    fi
+fi
+gsettings set org.gnome.desktop.interface color-scheme "$scheme" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface gtk-theme "$xset_name" 2>/dev/null || true
+gsettings set org.gnome.desktop.interface icon-theme "$icon_theme" 2>/dev/null || true
+if command -v xsettingsd >/dev/null 2>&1 && [ -f "$XSET_CONF" ]; then
+    if systemctl --user restart xsettingsd.service >/dev/null 2>&1; then
+        :
+    elif ! pgrep -x xsettingsd >/dev/null 2>&1; then
         setsid -f xsettingsd >/dev/null 2>&1
     fi
 fi
@@ -311,8 +332,18 @@ setsid -f waybar >/dev/null 2>&1 || true
 if pgrep -x swaync >/dev/null 2>&1; then
     swaync-client -rs >/dev/null 2>&1 || true
 fi
+if pgrep -x mako >/dev/null 2>&1 && command -v makoctl >/dev/null 2>&1; then
+    makoctl reload >/dev/null 2>&1 || true
+fi
+
+# Restart the GTK-based OSD daemon so its live style tracks GTK theme changes.
+if pgrep -x swayosd-server >/dev/null 2>&1; then
+    pkill -x swayosd-server 2>/dev/null || true
+    sleep 0.2
+    setsid -f swayosd-server >/dev/null 2>&1 || true
+fi
 
 # Hyprland re-reads theme.lua (border colours) without restarting apps.
 hyprctl reload >/dev/null 2>&1 || true
 
-notify-send "Theme" "\"$name\" applied to all apps ($mode) ✓"
+notify-send "Theme" "\"$name\" applied to supported desktop apps ($mode). Restart open apps if colors did not refresh."

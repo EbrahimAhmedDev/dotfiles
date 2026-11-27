@@ -1,9 +1,8 @@
-ark
+7zip
 awww
 base
 base-devel
 bat
-bluedevil
 blueman
 bluez-utils
 breeze
@@ -29,7 +28,6 @@ github-cli
 gnome-themes-extra
 grim
 gst-plugin-pipewire
-gwenview
 htop
 hypridle
 hyprland
@@ -41,13 +39,8 @@ hyprsunset
 inotify-tools
 intel-ucode
 jq
-kate
-kde-gtk-config
-kdeconnect
 kitty
-konsole
 kooha
-kscreen
 libpulse
 libreoffice-fresh
 linux
@@ -66,7 +59,6 @@ noto-fonts-emoji
 noto-fonts-extra
 npm
 nwg-look
-okular
 opencode-desktop
 pacman-contrib
 papirus-icon-theme
@@ -75,14 +67,11 @@ pipewire
 pipewire-alsa
 pipewire-jack
 pipewire-pulse
-plasma-desktop
-plasma-integration
-plasma-nm
-plasma-pa
 playerctl
 power-profiles-daemon
 python-setuptools
 qt5-wayland
+qt6ct
 qt6-wayland
 reflector
 rofi
@@ -93,7 +82,6 @@ starship
 stow
 sudo
 swaync
-systemsettings
 telegram-desktop
 thunderbird
 timeshift
@@ -101,6 +89,7 @@ tldr
 ttf-jetbrains-mono-nerd
 udiskie
 unzip
+unrar
 vlc
 vlc-plugins-all
 waybar
@@ -109,7 +98,9 @@ wireplumber
 wl-clipboard
 wob
 wpa_supplicant
+xarchiver
 xdg-desktop-portal-hyprland
+xsettingsd
 yazi
 zram-generator
 zsh

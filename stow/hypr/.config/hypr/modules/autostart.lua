@@ -1,6 +1,7 @@
 hl.on("hyprland.start", function()
     hl.exec_cmd("waybar")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")
+    hl.exec_cmd("systemctl --user start xsettingsd.service")
     hl.exec_cmd("hyprctl setcursor Bibata-Modern-Ice 24")
     hl.exec_cmd("clipse -listen")
     hl.exec_cmd("hypridle")

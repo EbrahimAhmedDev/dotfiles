@@ -38,11 +38,7 @@ s="$dot/system/sddm"
 sudo mkdir -p /etc/sddm.conf.d
 [ -d "$s/sddm.conf.d" ] && sudo cp -r "$s/sddm.conf.d/." /etc/sddm.conf.d/
 [ -f "$s/sddm.conf" ] && sudo cp "$s/sddm.conf" /etc/sddm.conf
-for t in silent nier-automata; do
-    [ -d "$s/theme-$t" ] || continue
-    sudo mkdir -p "/usr/share/sddm/themes/$t"
-    sudo cp -a "$s/theme-$t/." "/usr/share/sddm/themes/$t/"
-done
+sudo systemctl disable ly@tty2.service 2>/dev/null || true
 sudo systemctl enable sddm
 
 echo "done, reboot now"
